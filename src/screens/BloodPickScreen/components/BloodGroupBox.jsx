@@ -1,15 +1,28 @@
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import CustomText from "../../../components/Text/CustomText";
 import colors from "../../../theme/colors";
 import typography from "../../../theme/typography";
 
-export default BloodGroupBox = ({ name }) => {
+export default BloodGroupBox = ({ name, selectedGroup, handleSelectGroup }) => {
   return (
-    <View style={styles.bloodGroupView}>
-      <CustomText preset="h3" style={styles.groupNameText}>
-        {name}
-      </CustomText>
-    </View>
+    <Pressable onPress={() => handleSelectGroup(name)}>
+      <View
+        style={[
+          styles.bloodGroupView,
+          { backgroundColor: selectedGroup == name ? colors.red : colors.grey },
+        ]}
+      >
+        <CustomText
+          preset="h3"
+          style={[
+            styles.groupNameText,
+            { color: selectedGroup == name ? colors.white : colors.black },
+          ]}
+        >
+          {name}
+        </CustomText>
+      </View>
+    </Pressable>
   );
 };
 
@@ -17,7 +30,6 @@ const styles = StyleSheet.create({
   bloodGroupView: {
     width: 140,
     height: 70,
-    backgroundColor: colors.grey,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,

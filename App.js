@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import BloodPickScreen from "./src/screens/BloodPickScreen/BloodPickScreen";
 import IndexScreen from "./src/screens/IndexScreen/IndexScreen";
+import SignUpScreen from "./src/screens/SignUpScreen/SignUpScreen";
 import globalStyles from "./src/theme/globalStyles";
 import spacing from "./src/theme/spacing";
 
@@ -26,7 +27,8 @@ export default function App() {
 
   return (
     <SafeAreaView style={[styles.container]}>
-      <BloodPickScreen />
+      <SignUpScreen />
+      <StatusBar />
     </SafeAreaView>
   );
 }

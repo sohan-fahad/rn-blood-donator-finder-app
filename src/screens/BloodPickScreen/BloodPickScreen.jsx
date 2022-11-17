@@ -5,9 +5,21 @@ import typography from "../../theme/typography";
 import BloodGroupBox from "./components/BloodGroupBox";
 import { AntDesign } from "@expo/vector-icons";
 import colors from "../../theme/colors";
+import { useState } from "react";
 
 export default BloodPickScreen = () => {
   const bloodGroups = ["A", "B", "O", "AB"];
+  const [selectedGroup, setSelectedGroup] = useState("");
+  const [selectedVarient, setSelectedVarient] = useState("");
+
+  const handleSelectGroup = (name) => {
+    setSelectedGroup(name);
+  };
+
+  const handleGroupVarient = (name) => {
+    setSelectedVarient(name);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.svgView}>
@@ -27,16 +39,47 @@ export default BloodPickScreen = () => {
           }}
         >
           {bloodGroups.map((group, index) => (
-            <BloodGroupBox key={index} name={group} />
+            <BloodGroupBox
+              key={index}
+              name={group}
+              handleSelectGroup={handleSelectGroup}
+              selectedGroup={selectedGroup}
+            />
           ))}
         </View>
 
         <View style={styles.PosNegView}>
-          <Pressable style={styles.pressableGroupPosNeg}>
-            <AntDesign name="plus" size={24} color="black" />
+          <Pressable
+            style={[
+              styles.pressableGroupPosNeg,
+              {
+                backgroundColor:
+                  selectedVarient == "plus" ? colors.red : colors.grey,
+              },
+            ]}
+            onPress={() => handleGroupVarient("plus")}
+          >
+            <AntDesign
+              name="plus"
+              size={24}
+              color={selectedVarient == "plus" ? colors.white : colors.black}
+            />
           </Pressable>
-          <Pressable style={styles.pressableGroupPosNeg}>
-            <AntDesign name="minus" size={24} color="black" />
+          <Pressable
+            style={[
+              styles.pressableGroupPosNeg,
+              {
+                backgroundColor:
+                  selectedVarient == "minus" ? colors.red : colors.grey,
+              },
+            ]}
+            onPress={() => handleGroupVarient("minus")}
+          >
+            <AntDesign
+              name="minus"
+              size={24}
+              color={selectedVarient == "minus" ? colors.white : colors.black}
+            />
           </Pressable>
         </View>
         <View style={styles.nextBtnView}>
@@ -70,7 +113,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   pressableGroupPosNeg: {
-    backgroundColor: colors.grey,
     height: 50,
     width: 50,
     borderRadius: 5,
