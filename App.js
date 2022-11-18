@@ -2,7 +2,11 @@ import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import BloodPickScreen from "./src/screens/BloodPickScreen/BloodPickScreen";
+import HomeScreen from "./src/screens/HomeScreen/HomeScreen";
 import IndexScreen from "./src/screens/IndexScreen/IndexScreen";
+import LoginScreen from "./src/screens/LoginScreen/LoginScreen";
+import ProfileScreen from "./src/screens/ProfileScreen/ProfileScreen";
+import SearchResultScreen from "./src/screens/SearchResultScreen/SearchResultScreen";
 import SignUpScreen from "./src/screens/SignUpScreen/SignUpScreen";
 import globalStyles from "./src/theme/globalStyles";
 import spacing from "./src/theme/spacing";
@@ -27,7 +31,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={[styles.container]}>
-      <SignUpScreen />
+      <ProfileScreen />
       <StatusBar />
     </SafeAreaView>
   );
@@ -40,6 +44,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
-    padding: spacing[5],
   },
 });

@@ -6,6 +6,7 @@ import BloodGroupBox from "./components/BloodGroupBox";
 import { AntDesign } from "@expo/vector-icons";
 import colors from "../../theme/colors";
 import { useState } from "react";
+import spacing from "../../theme/spacing";
 
 export default BloodPickScreen = () => {
   const bloodGroups = ["A", "B", "O", "AB"];
@@ -95,6 +96,7 @@ export default BloodPickScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: spacing[5],
   },
   svgView: {
     flex: 1,

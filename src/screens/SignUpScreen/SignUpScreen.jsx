@@ -7,10 +7,9 @@ import Input from "../../components/Text/Input";
 import { useEffect, useState } from "react";
 import locationList from "../../data/locationList";
 import { Picker } from "@react-native-picker/picker";
-// import DistrictPicker from "./DistrictPicker";
-import SubDistrictPicker from "./SubDistrictPicker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment/moment";
+import spacing from "../../theme/spacing";
 
 export default SignUpScreen = () => {
   const [name, setName] = useState("");
@@ -204,6 +203,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     position: "relative",
+    padding: spacing[5],
   },
   topRedCircleView: {
     position: "absolute",
