@@ -16,7 +16,7 @@ export default Input = ({
       style={textStyle}
       placeholder={placeholder}
       secureTextEntry={isPasswordInput}
-      onTextInput={(text) => handleTextInput(text)}
+      onChangeText={(text) => handleTextInput(text)}
       keyboardType={keyboardType}
       autoCapitalize={autoCapitalize}
       autoCorrect={false}

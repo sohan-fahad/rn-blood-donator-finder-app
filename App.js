@@ -15,10 +15,16 @@ import store from "./src/store";
 import globalStyles from "./src/theme/globalStyles";
 import spacing from "./src/theme/spacing";
 import FlashMessage from "react-native-flash-message";
+import { useEffect } from "react";
+import intializeFirebase from "./src/firebase/firebase.init";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  useEffect(() => {
+    console.log("first");
+  });
+
   const [fontsLoaded] = useFonts({
     "Inter-Bold": require("./assets/fonts/Inter-Bold.ttf"),
     "Inter-Light": require("./assets/fonts/Inter-Light.ttf"),
@@ -42,10 +48,18 @@ export default function App() {
     <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Index" component={IndexScreen} />
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="SignUp" component={SignUpScreen} />
-          <Stack.Screen name="BloodPicker" component={BloodPickScreen} />
+          {user ? (
+            <>
+              <Stack.Screen name="Home" component={HomeScreen} />
+            </>
+          ) : (
+            <>
+              <Stack.Screen name="Index" component={IndexScreen} />
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="SignUp" component={SignUpScreen} />
+              <Stack.Screen name="BloodPicker" component={BloodPickScreen} />
+            </>
+          )}
         </Stack.Navigator>
       </NavigationContainer>
       <StatusBar style="light" />

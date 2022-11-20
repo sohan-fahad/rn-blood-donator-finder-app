@@ -1,18 +1,24 @@
 import CustomText from "../../components/Text/CustomText";
 import { AntDesign } from "@expo/vector-icons";
 import { Pressable, StyleSheet, View, Button, ScrollView } from "react-native";
+import { showMessage } from "react-native-flash-message";
 import colors from "../../theme/colors";
 import BloodDonateVector from "../../svg/BloodDonateVector";
 import Input from "../../components/Text/Input";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment/moment";
 import spacing from "../../theme/spacing";
 import { LocationApiService } from "../../services/divisions";
+import intializeFirebase from "../../firebase/firebase.init";
+import useFirebase from "../../hooks/useFirebase";
 
 export default SignUpScreen = ({ navigation }) => {
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
   const [division, setDivision] = useState("");
   const [district, setDistrict] = useState("");
   const [subDistrict, setSubDistrict] = useState("");
@@ -23,9 +29,14 @@ export default SignUpScreen = ({ navigation }) => {
   const [subDistrictList, setSubDistrictList] = useState([]);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
+  const { createAccount } = useFirebase();
+
   useEffect(() => {
     getLocation();
+    intializeFirebase();
   }, [!locations]);
+
+  const nameRef = useRef(null);
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -88,6 +99,37 @@ export default SignUpScreen = ({ navigation }) => {
     setLocations(res);
   };
 
+  const userRegister = async () => {
+    if (
+      email &&
+      password &&
+      name &&
+      phoneNumber &&
+      division &&
+      district &&
+      subDistrict &&
+      donationDate
+    ) {
+      createAccount(
+        email,
+        password,
+        name,
+        phoneNumber,
+        division,
+        district,
+        subDistrict,
+        donationDate,
+        navigation
+      );
+    } else {
+      showMessage({
+        message: "",
+        description: "invalid email or password",
+        type: "danger",
+      });
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.topRedCircleView} />
@@ -104,19 +146,19 @@ export default SignUpScreen = ({ navigation }) => {
         <Input
           style={styles.input}
           placeholder="Enter Name"
-          handleTextInput={handleTextInput}
+          handleTextInput={(text) => setName(text)}
           autoCapitalize="words"
         />
         <Input
           style={styles.input}
           placeholder="Enter Email"
-          handleTextInput={handleTextInput}
+          handleTextInput={(text) => setEmail(text)}
           keyboardType="email-address"
         />
         <Input
           style={styles.input}
           placeholder="Enter Phone Number"
-          handleTextInput={handleTextInput}
+          handleTextInput={(text) => setPhoneNumber(text)}
           keyboardType="phone-pad"
         />
         <View style={styles.selectInput}>
@@ -195,10 +237,13 @@ export default SignUpScreen = ({ navigation }) => {
         <Input
           style={styles.input}
           placeholder="Enter Password"
-          handleTextInput={handleTextInput}
+          handleTextInput={(text) => setPassword(text)}
           isPasswordInput={true}
         />
-        <Pressable style={{ flex: 1, justifyContent: "flex-end" }}>
+        <Pressable
+          style={{ flex: 1, justifyContent: "flex-end" }}
+          onPress={userRegister}
+        >
           <CustomText style={styles.signUpBtn}>Sign Up</CustomText>
         </Pressable>
       </ScrollView>
