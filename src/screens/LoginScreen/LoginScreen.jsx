@@ -6,16 +6,32 @@ import BloodDonateVector from "../../svg/BloodDonateVector";
 import colors from "../../theme/colors";
 import spacing from "../../theme/spacing";
 import typography from "../../theme/typography";
+import { showMessage } from "react-native-flash-message";
+import useFirebase from "../../hooks/useFirebase";
 
-export default LoginScreen = () => {
+export default LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useFirebase();
 
   const handleEmail = (text) => {
     setEmail(text);
   };
   const handlePassword = (text) => {
     setPassword(text);
+  };
+
+  const handleLogin = () => {
+    if (email && password) {
+      login(email, password);
+    } else {
+      showMessage({
+        message: "",
+        description: "invalid email or password",
+        type: "danger",
+      });
+    }
   };
   return (
     <View style={styles.container}>
@@ -27,12 +43,12 @@ export default LoginScreen = () => {
         <Input
           placeholder="Email"
           keyboardType="email-address"
-          onTextInput={handleEmail}
+          handleTextInput={handleEmail}
           style={styles.input}
         />
         <Input
           placeholder="Password"
-          onTextInput={handlePassword}
+          handleTextInput={handlePassword}
           style={styles.input}
           secureTextEntry={true}
         />
@@ -40,12 +56,12 @@ export default LoginScreen = () => {
           <CustomText style={styles.forgotPinText}>Forgot your pin?</CustomText>
         </Pressable>
 
-        <Pressable>
+        <Pressable onPress={handleLogin}>
           <CustomText style={styles.loginBtn}>Login</CustomText>
         </Pressable>
         <View style={styles.footerView}>
           <CustomText>Don't have an account?</CustomText>
-          <Pressable>
+          <Pressable onPress={() => navigation.navigate("SignUp")}>
             <CustomText style={styles.registerFooterBtn}>Register</CustomText>
           </Pressable>
         </View>

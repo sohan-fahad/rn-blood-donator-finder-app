@@ -1,26 +1,37 @@
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, SafeAreaView, StyleSheet, View } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import locationList from "../../data/locationList";
 import LogoutIconSvg from "../../svg/LogoutIconSvg";
 import UserIconSvg from "../../svg/UserIconSvg";
 import colors from "../../theme/colors";
 import spacing from "../../theme/spacing";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CustomText from "../../components/Text/CustomText";
 import typography from "../../theme/typography";
 import HomeBloodDonarSvg from "../../svg/HomeBloodDonar";
+import globalStyles from "../../theme/globalStyles";
+import useFirebase from "../../hooks/useFirebase";
+import { useDispatch } from "react-redux";
+import { removeBloodGroup } from "../../store/reducers/addBloodGroupSlice";
+import { LocationApiService } from "../../services/divisions";
 
-export default HomeScreen = () => {
+export default HomeScreen = ({ navigation }) => {
   const [division, setDivision] = useState("");
   const [district, setDistrict] = useState("");
   const [subDistrict, setSubDistrict] = useState("");
   const [bloodGroup, setBloodGroup] = useState("");
 
-  const [locations, setLocations] = useState(locationList);
+  const [locations, setLocations] = useState();
   const [districtList, setDistrictList] = useState([]);
   const [subDistrictList, setSubDistrictList] = useState([]);
 
   const bloodGroups = ["A+", "B+", "O+", "AB+", "A-", "B-", "O-", "AB-"];
+
+  const { user, logOut } = useFirebase();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    getLocation();
+  }, [!locations]);
 
   const handleDivision = (divisionName) => {
     if (divisionName) {
@@ -60,13 +71,27 @@ export default HomeScreen = () => {
       setSubDistrict("");
     }
   };
+
+  const getLocation = async () => {
+    const res = await LocationApiService.divisons();
+    setLocations(res);
+  };
+
+  const handleLogout = () => {
+    dispatch(removeBloodGroup());
+    logOut();
+  };
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.topReactAngel} />
       <View style={styles.contentWrapper}>
         <View style={styles.topViewContainer}>
-          <UserIconSvg />
-          <LogoutIconSvg />
+          <Pressable onPress={() => navigation.navigate("Profile")}>
+            <UserIconSvg />
+          </Pressable>
+          <Pressable onPress={() => handleLogout()}>
+            <LogoutIconSvg />
+          </Pressable>
         </View>
         <View style={styles.fliterContainer}>
           {/* Blood Group List Picker */}
@@ -153,12 +178,13 @@ export default HomeScreen = () => {
           </CustomText>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    ...globalStyles.adroidSafeArea,
     flex: 1,
     width: "100%",
     position: "relative",

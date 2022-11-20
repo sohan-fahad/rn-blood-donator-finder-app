@@ -34,7 +34,9 @@ export default BloodPickScreen = ({ navigation }) => {
 
   const pickBloodGroup = () => {
     if (selectedGroup && selectedVarient) {
-      dispatch(addBloodGroup("A+"));
+      dispatch(addBloodGroup(selectedGroup + selectedVarient));
+      setSelectedGroup("");
+      setSelectedVarient("");
       navigation.navigate("SignUp");
     } else {
       if (!selectedGroup) {
@@ -88,15 +90,15 @@ export default BloodPickScreen = ({ navigation }) => {
               styles.pressableGroupPosNeg,
               {
                 backgroundColor:
-                  selectedVarient == "plus" ? colors.red : colors.darkGrey,
+                  selectedVarient == "+" ? colors.red : colors.darkGrey,
               },
             ]}
-            onPress={() => handleGroupVarient("plus")}
+            onPress={() => handleGroupVarient("+")}
           >
             <AntDesign
               name="plus"
               size={24}
-              color={selectedVarient == "plus" ? colors.white : colors.black}
+              color={selectedVarient == "+" ? colors.white : colors.black}
             />
           </Pressable>
           <Pressable
@@ -104,15 +106,15 @@ export default BloodPickScreen = ({ navigation }) => {
               styles.pressableGroupPosNeg,
               {
                 backgroundColor:
-                  selectedVarient == "minus" ? colors.red : colors.darkGrey,
+                  selectedVarient == "-" ? colors.red : colors.darkGrey,
               },
             ]}
-            onPress={() => handleGroupVarient("minus")}
+            onPress={() => handleGroupVarient("-")}
           >
             <AntDesign
               name="minus"
               size={24}
-              color={selectedVarient == "minus" ? colors.white : colors.black}
+              color={selectedVarient == "-" ? colors.white : colors.black}
             />
           </Pressable>
         </View>

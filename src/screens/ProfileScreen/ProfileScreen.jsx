@@ -1,24 +1,45 @@
-import { Button, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import {
+  Button,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import HeaderComponent from "../../components/Layout/HeaderComponent";
 import spacing from "../../theme/spacing";
 import { AntDesign, MaterialIcons, Feather } from "@expo/vector-icons";
 import colors from "../../theme/colors";
 import CustomText from "../../components/Text/CustomText";
 import DonateDateList from "./components/DonateDateList";
-import { useDispatch, useSelector } from "react-redux";
-import { increment, selectCount } from "../../store/reducers/counterSlice";
+import { useDispatch } from "react-redux";
+import useFirebase from "../../hooks/useFirebase";
+import { useEffect } from "react";
+import { removeBloodGroup } from "../../store/reducers/addBloodGroupSlice";
+import globalStyles from "../../theme/globalStyles";
 
-export default ProfileScreen = () => {
-  // const dispatch = useDispatch();
-  // const count = useSelector(selectCount);
+export default ProfileScreen = ({ navigation }) => {
+  const { user, getUserData, userInfo, logOut } = useFirebase();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (user) {
+      getUserData(user.uid);
+    }
+  }, [!user]);
+
+  const handleLogout = () => {
+    dispatch(removeBloodGroup());
+    logOut();
+  };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.headerView}>
-        <Pressable>
+        <Pressable onPress={() => navigation.goBack()}>
           <AntDesign name="arrowleft" size={24} color={colors.red} />
         </Pressable>
-        <Pressable>
+        <Pressable onPress={handleLogout}>
           <MaterialIcons name="logout" size={24} color={colors.red} />
         </Pressable>
       </View>
@@ -28,7 +49,9 @@ export default ProfileScreen = () => {
             <CustomText preset="h4" style={styles.userInfoTextColor}>
               Name:
             </CustomText>
-            <CustomText style={styles.userInfoTextColor}>Donor Name</CustomText>
+            <CustomText style={styles.userInfoTextColor}>
+              {userInfo?.name}
+            </CustomText>
           </View>
 
           <View style={{ marginBottom: 10 }}>
@@ -36,14 +59,17 @@ export default ProfileScreen = () => {
               Address:
             </CustomText>
             <CustomText style={styles.userInfoTextColor}>
-              Feni Sadar, Feni, Chittagong
+              {userInfo?.subDistrict}, {userInfo?.district},{" "}
+              {userInfo?.division}
             </CustomText>
           </View>
           <View style={{ marginBottom: 10 }}>
             <CustomText preset="h4" style={styles.userInfoTextColor}>
               Last Donation:
             </CustomText>
-            <CustomText style={styles.userInfoTextColor}>21/12/2021</CustomText>
+            <CustomText style={styles.userInfoTextColor}>
+              {userInfo?.donationLis[userInfo?.donationLis.length - 1]}
+            </CustomText>
           </View>
         </View>
         <View style={styles.imageView}></View>
@@ -58,14 +84,17 @@ export default ProfileScreen = () => {
         </Pressable>
       </View>
       <ScrollView style={{ marginTop: 20 }}>
-        <DonateDateList index={1} date="12/12/2021" />
+        {userInfo?.donationLis.map((date, index) => (
+          <DonateDateList key={index} index={index + 1} date={date} />
+        ))}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    ...globalStyles.adroidSafeArea,
     paddingHorizontal: spacing[5],
     flex: 1,
     width: "100%",

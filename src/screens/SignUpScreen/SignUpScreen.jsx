@@ -1,6 +1,13 @@
 import CustomText from "../../components/Text/CustomText";
 import { AntDesign } from "@expo/vector-icons";
-import { Pressable, StyleSheet, View, Button, ScrollView } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  View,
+  Button,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 import { showMessage } from "react-native-flash-message";
 import colors from "../../theme/colors";
 import BloodDonateVector from "../../svg/BloodDonateVector";
@@ -13,6 +20,8 @@ import spacing from "../../theme/spacing";
 import { LocationApiService } from "../../services/divisions";
 import intializeFirebase from "../../firebase/firebase.init";
 import useFirebase from "../../hooks/useFirebase";
+import { useSelector } from "react-redux";
+import { selectBloodGroup } from "../../store/reducers/addBloodGroupSlice";
 
 export default SignUpScreen = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -28,15 +37,16 @@ export default SignUpScreen = ({ navigation }) => {
   const [districtList, setDistrictList] = useState([]);
   const [subDistrictList, setSubDistrictList] = useState([]);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { createAccount } = useFirebase();
+
+  const bloodGroup = useSelector(selectBloodGroup);
 
   useEffect(() => {
     getLocation();
     intializeFirebase();
   }, [!locations]);
-
-  const nameRef = useRef(null);
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -100,6 +110,7 @@ export default SignUpScreen = ({ navigation }) => {
   };
 
   const userRegister = async () => {
+    setIsLoading(true);
     if (
       email &&
       password &&
@@ -108,6 +119,7 @@ export default SignUpScreen = ({ navigation }) => {
       division &&
       district &&
       subDistrict &&
+      bloodGroup &&
       donationDate
     ) {
       createAccount(
@@ -118,8 +130,8 @@ export default SignUpScreen = ({ navigation }) => {
         division,
         district,
         subDistrict,
-        donationDate,
-        navigation
+        bloodGroup,
+        donationDate
       );
     } else {
       showMessage({
@@ -128,6 +140,7 @@ export default SignUpScreen = ({ navigation }) => {
         type: "danger",
       });
     }
+    setIsLoading(false);
   };
 
   return (
@@ -240,12 +253,18 @@ export default SignUpScreen = ({ navigation }) => {
           handleTextInput={(text) => setPassword(text)}
           isPasswordInput={true}
         />
-        <Pressable
-          style={{ flex: 1, justifyContent: "flex-end" }}
-          onPress={userRegister}
-        >
-          <CustomText style={styles.signUpBtn}>Sign Up</CustomText>
-        </Pressable>
+        {!isLoading ? (
+          <Pressable
+            style={{ flex: 1, justifyContent: "flex-end" }}
+            onPress={userRegister}
+          >
+            <CustomText style={styles.signUpBtn}>Sign Up</CustomText>
+          </Pressable>
+        ) : (
+          <CustomText style={styles.signUpBtn}>
+            <ActivityIndicator color={colors.white} />
+          </CustomText>
+        )}
       </ScrollView>
     </View>
   );
@@ -304,6 +323,7 @@ const styles = StyleSheet.create({
     padding: 18,
     fontFamily: typography.primaryBold,
     textAlign: "center",
+    justifyContent: "center",
     borderRadius: 10,
   },
 });

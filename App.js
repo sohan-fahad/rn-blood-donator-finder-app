@@ -13,17 +13,14 @@ import SearchResultScreen from "./src/screens/SearchResultScreen/SearchResultScr
 import SignUpScreen from "./src/screens/SignUpScreen/SignUpScreen";
 import store from "./src/store";
 import globalStyles from "./src/theme/globalStyles";
-import spacing from "./src/theme/spacing";
 import FlashMessage from "react-native-flash-message";
 import { useEffect } from "react";
-import intializeFirebase from "./src/firebase/firebase.init";
+import useFirebase from "./src/hooks/useFirebase";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  useEffect(() => {
-    console.log("first");
-  });
+  const { user } = useFirebase();
 
   const [fontsLoaded] = useFonts({
     "Inter-Bold": require("./assets/fonts/Inter-Bold.ttf"),
@@ -41,8 +38,11 @@ export default function App() {
   if (!fontsLoaded) {
     return <Text>Font loading...!</Text>;
   }
+  // useEffect(() => {
+  //   AsyncStorage.clear();
+  // });
 
-  const user = false;
+  // const user = false;
 
   return (
     <Provider store={store}>
@@ -51,6 +51,8 @@ export default function App() {
           {user ? (
             <>
               <Stack.Screen name="Home" component={HomeScreen} />
+              <Stack.Screen name="Profile" component={ProfileScreen} />
+              <Stack.Screen name="Search" component={SearchResultScreen} />
             </>
           ) : (
             <>
