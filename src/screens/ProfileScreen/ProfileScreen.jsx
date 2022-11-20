@@ -1,5 +1,6 @@
 import {
-  Button,
+  Image,
+  Platform,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -14,23 +15,79 @@ import CustomText from "../../components/Text/CustomText";
 import DonateDateList from "./components/DonateDateList";
 import { useDispatch } from "react-redux";
 import useFirebase from "../../hooks/useFirebase";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { removeBloodGroup } from "../../store/reducers/addBloodGroupSlice";
+import * as ImagePicker from "expo-image-picker";
 import globalStyles from "../../theme/globalStyles";
+import { UserServieApi } from "../../services/user";
+import { showMessage } from "react-native-flash-message";
 
 export default ProfileScreen = ({ navigation }) => {
-  const { user, getUserData, userInfo, logOut } = useFirebase();
+  const [controller, setController] = useState(false);
+
+  const { user, getUserData, userInfo, logOut, updateImage } = useFirebase();
   const dispatch = useDispatch();
 
   useEffect(() => {
+    console.log(userInfo?.image);
     if (user) {
       getUserData(user.uid);
     }
-  }, [!user]);
+  }, [!user, controller]);
+
+  useEffect(() => {
+    askForPermission();
+  }, []);
 
   const handleLogout = () => {
     dispatch(removeBloodGroup());
     logOut();
+  };
+
+  const askForPermission = async () => {
+    if (Platform.OS !== "web") {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (status !== "granted") {
+        alert("Permisson denied");
+      }
+    }
+  };
+
+  const handleUploadImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [3, 4],
+      quality: 1,
+      base64: true,
+    });
+
+    if (result.canceled) {
+      return;
+    }
+    let localUri = result.assets[0].uri;
+    let filename = localUri.split("/").pop();
+    let match = /\.(\w+)$/.exec(filename);
+    let type = match ? `image/${match[1]}` : `image`;
+
+    const response = await UserServieApi.updateImage(localUri, filename, type);
+    if (response.data.display_url) {
+      await updateImage(response.data.display_url);
+      setController(!controller);
+      showMessage({
+        message: "",
+        description: "Profile image updated!",
+        type: "success",
+      });
+    } else {
+      showMessage({
+        message: "",
+        description: "Unable to update profile image",
+        type: "danger",
+      });
+    }
   };
 
   return (
@@ -68,11 +125,18 @@ export default ProfileScreen = ({ navigation }) => {
               Last Donation:
             </CustomText>
             <CustomText style={styles.userInfoTextColor}>
-              {userInfo?.donationLis[userInfo?.donationLis.length - 1]}
+              {userInfo?.donationList[userInfo?.donationList.length - 1]}
             </CustomText>
           </View>
         </View>
-        <View style={styles.imageView}></View>
+        <View style={styles.imageView}>
+          <Pressable style={styles.imgEditBtn} onPress={handleUploadImage}>
+            <Feather name="edit" size={15} color={colors.white} />
+          </Pressable>
+          {userInfo?.image && (
+            <Image source={{ uri: userInfo?.image, height: 200 }} />
+          )}
+        </View>
       </View>
       <View style={styles.donationListTitle}>
         <CustomText style={{ color: colors.red }}>Donation List</CustomText>
@@ -84,7 +148,7 @@ export default ProfileScreen = ({ navigation }) => {
         </Pressable>
       </View>
       <ScrollView style={{ marginTop: 20 }}>
-        {userInfo?.donationLis.map((date, index) => (
+        {userInfo?.donationList.map((date, index) => (
           <DonateDateList key={index} index={index + 1} date={date} />
         ))}
       </ScrollView>
@@ -118,6 +182,22 @@ const styles = StyleSheet.create({
   imageView: {
     width: "40%",
     backgroundColor: colors.grey,
+    position: "relative",
+    borderRadius: 10,
+    overflow: "hidden",
+    maxHeight: 180,
+  },
+  imgEditBtn: {
+    backgroundColor: colors.red,
+    height: 40,
+    width: 40,
+    position: "absolute",
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    top: 5,
+    right: 5,
+    zIndex: 10,
   },
   userInfoTextColor: {
     color: colors.white,

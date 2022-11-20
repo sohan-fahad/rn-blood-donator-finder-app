@@ -13,6 +13,7 @@ import {
   query,
   where,
   onSnapshot,
+  updateDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import intializeFirebase from "../firebase/firebase.init";
@@ -63,7 +64,7 @@ const useFirebase = () => {
         const user = userCredential.user;
         if (user.accessToken) {
           const userInfo = {
-            id: user.uid,
+            uid: user.uid,
             name,
             email,
             phoneNumber,
@@ -71,7 +72,7 @@ const useFirebase = () => {
             district,
             subDistrict,
             bloodGroup,
-            donationLis: [lastDonate],
+            donationList: [lastDonate],
             image: "",
           };
 
@@ -130,16 +131,35 @@ const useFirebase = () => {
   };
 
   const getUserData = async (id) => {
-    const q = query(collection(db, "users"), where("id", "==", id));
+    const q = query(collection(db, "users"), where("uid", "==", id));
     const aa = onSnapshot(q, (querySnapshot) => {
       list = [];
       querySnapshot.docs.forEach((item) => {
-        setUserInfo(item.data());
-        // console.log(item.data());
+        setUserInfo({ id: item.id, ...item.data() });
       });
     });
 
     return aa;
+  };
+
+  const updateImage = async (url) => {
+    try {
+      const userRef = doc(db, "users", userInfo.id);
+      const updateObj = {
+        bloodGroup: userInfo.bloodGroup,
+        division: userInfo.division,
+        district: userInfo.district,
+        subDistrict: userInfo.subDistrict,
+        donationList: userInfo.donationList,
+        image: url,
+        name: userInfo.name,
+        phoneNumber: userInfo.phoneNumber,
+        uid: userInfo.uid,
+      };
+      await updateDoc(userRef, updateObj);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return {
@@ -150,6 +170,7 @@ const useFirebase = () => {
     isLoading,
     userInfo,
     getUserData,
+    updateImage,
   };
 };
 
