@@ -5,17 +5,17 @@ import colors from "../../theme/colors";
 import spacing from "../../theme/spacing";
 import typography from "../../theme/typography";
 
-const IndexScreen = ({ navigator }) => {
+const IndexScreen = ({ navigation }) => {
   return (
     <View style={styles.cantainer}>
       <View style={styles.svgViews}>
         <BloodDropSVG />
       </View>
       <View style={styles.buttonsView}>
-        <Pressable>
+        <Pressable onPress={() => navigation?.navigate("Login")}>
           <CustomText style={styles.siginbutton}>Sign In</CustomText>
         </Pressable>
-        <Pressable>
+        <Pressable onPress={() => navigation.navigate("BloodPicker")}>
           <CustomText style={styles.createAccounBtn}>Create Account</CustomText>
         </Pressable>
       </View>
@@ -30,6 +30,7 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
+    padding: spacing[5],
   },
   svgViews: {
     flex: 1,

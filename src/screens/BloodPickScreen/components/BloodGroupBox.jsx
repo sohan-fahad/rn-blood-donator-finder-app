@@ -9,7 +9,10 @@ export default BloodGroupBox = ({ name, selectedGroup, handleSelectGroup }) => {
       <View
         style={[
           styles.bloodGroupView,
-          { backgroundColor: selectedGroup == name ? colors.red : colors.grey },
+          {
+            backgroundColor:
+              selectedGroup == name ? colors.red : colors.darkGrey,
+          },
         ]}
       >
         <CustomText
@@ -34,6 +37,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 10,
     margin: 5,
+    backgroundColor: colors.grey,
   },
   groupNameText: {
     fontFamily: typography.primaryMedium,

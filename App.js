@@ -1,6 +1,9 @@
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { Button, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { Provider } from "react-redux";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import BloodPickScreen from "./src/screens/BloodPickScreen/BloodPickScreen";
 import HomeScreen from "./src/screens/HomeScreen/HomeScreen";
 import IndexScreen from "./src/screens/IndexScreen/IndexScreen";
@@ -8,8 +11,12 @@ import LoginScreen from "./src/screens/LoginScreen/LoginScreen";
 import ProfileScreen from "./src/screens/ProfileScreen/ProfileScreen";
 import SearchResultScreen from "./src/screens/SearchResultScreen/SearchResultScreen";
 import SignUpScreen from "./src/screens/SignUpScreen/SignUpScreen";
+import store from "./src/store";
 import globalStyles from "./src/theme/globalStyles";
 import spacing from "./src/theme/spacing";
+import FlashMessage from "react-native-flash-message";
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -29,11 +36,21 @@ export default function App() {
     return <Text>Font loading...!</Text>;
   }
 
+  const user = false;
+
   return (
-    <SafeAreaView style={[styles.container]}>
-      <ProfileScreen />
-      <StatusBar />
-    </SafeAreaView>
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Index" component={IndexScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="SignUp" component={SignUpScreen} />
+          <Stack.Screen name="BloodPicker" component={BloodPickScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+      <StatusBar style="light" />
+      <FlashMessage position="top" />
+    </Provider>
   );
 }
 

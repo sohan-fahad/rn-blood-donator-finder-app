@@ -5,26 +5,26 @@ import colors from "../../theme/colors";
 import BloodDonateVector from "../../svg/BloodDonateVector";
 import Input from "../../components/Text/Input";
 import { useEffect, useState } from "react";
-import locationList from "../../data/locationList";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment/moment";
 import spacing from "../../theme/spacing";
+import { LocationApiService } from "../../services/divisions";
 
-export default SignUpScreen = () => {
+export default SignUpScreen = ({ navigation }) => {
   const [name, setName] = useState("");
   const [division, setDivision] = useState("");
   const [district, setDistrict] = useState("");
   const [subDistrict, setSubDistrict] = useState("");
   const [donationDate, setDonationDate] = useState("");
 
-  const [locations, setLocations] = useState(locationList);
+  const [locations, setLocations] = useState();
   const [districtList, setDistrictList] = useState([]);
   const [subDistrictList, setSubDistrictList] = useState([]);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   useEffect(() => {
-    setLocations(locationsList);
+    getLocation();
   }, [!locations]);
 
   const showDatePicker = () => {
@@ -83,10 +83,18 @@ export default SignUpScreen = () => {
     }
   };
 
+  const getLocation = async () => {
+    const res = await LocationApiService.divisons();
+    setLocations(res);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.topRedCircleView} />
-      <Pressable style={styles.backArrowView}>
+      <Pressable
+        style={styles.backArrowView}
+        onPress={() => navigation.goBack()}
+      >
         <AntDesign name="arrowleft" size={30} color={colors.red} />
       </Pressable>
       {/* <View style={styles.viewSvgImage}>

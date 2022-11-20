@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, SafeAreaView, StyleSheet, View } from "react-native";
+import { showMessage, hideMessage } from "react-native-flash-message";
 import CustomText from "../../components/Text/CustomText";
 import BloodDropRedSVG from "../../svg/BloodDropRedSvg";
 import typography from "../../theme/typography";
@@ -7,11 +8,21 @@ import { AntDesign } from "@expo/vector-icons";
 import colors from "../../theme/colors";
 import { useState } from "react";
 import spacing from "../../theme/spacing";
+import globalStyles from "../../theme/globalStyles";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addBloodGroup,
+  selectBloodGroup,
+} from "../../store/reducers/addBloodGroupSlice";
+import { selectCount } from "../../store/reducers/counterSlice";
 
-export default BloodPickScreen = () => {
+export default BloodPickScreen = ({ navigation }) => {
   const bloodGroups = ["A", "B", "O", "AB"];
   const [selectedGroup, setSelectedGroup] = useState("");
   const [selectedVarient, setSelectedVarient] = useState("");
+
+  const dispatch = useDispatch();
+  // const gr = useSelector(selectBloodGroup);
 
   const handleSelectGroup = (name) => {
     setSelectedGroup(name);
@@ -21,8 +32,30 @@ export default BloodPickScreen = () => {
     setSelectedVarient(name);
   };
 
+  const pickBloodGroup = () => {
+    if (selectedGroup && selectedVarient) {
+      dispatch(addBloodGroup("A+"));
+      navigation.navigate("SignUp");
+    } else {
+      if (!selectedGroup) {
+        showMessage({
+          message: "",
+          description: "Pick your blood group!",
+          type: "danger",
+        });
+      } else if (!selectedVarient) {
+        showMessage({
+          message: "",
+          description: "Pick your blood group varient!",
+          type: "danger",
+        });
+      }
+    }
+  };
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      {/* <CustomText>{gr}</CustomText> */}
       <View style={styles.svgView}>
         <BloodDropRedSVG />
       </View>
@@ -55,7 +88,7 @@ export default BloodPickScreen = () => {
               styles.pressableGroupPosNeg,
               {
                 backgroundColor:
-                  selectedVarient == "plus" ? colors.red : colors.grey,
+                  selectedVarient == "plus" ? colors.red : colors.darkGrey,
               },
             ]}
             onPress={() => handleGroupVarient("plus")}
@@ -71,7 +104,7 @@ export default BloodPickScreen = () => {
               styles.pressableGroupPosNeg,
               {
                 backgroundColor:
-                  selectedVarient == "minus" ? colors.red : colors.grey,
+                  selectedVarient == "minus" ? colors.red : colors.darkGrey,
               },
             ]}
             onPress={() => handleGroupVarient("minus")}
@@ -84,17 +117,18 @@ export default BloodPickScreen = () => {
           </Pressable>
         </View>
         <View style={styles.nextBtnView}>
-          <Pressable>
+          <Pressable onPress={pickBloodGroup}>
             <CustomText style={styles.nextBtn}>Next</CustomText>
           </Pressable>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    ...globalStyles.adroidSafeArea,
     flex: 1,
     padding: spacing[5],
   },

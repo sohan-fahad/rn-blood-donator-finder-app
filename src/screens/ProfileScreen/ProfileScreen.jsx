@@ -1,12 +1,17 @@
-import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Button, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import HeaderComponent from "../../components/Layout/HeaderComponent";
 import spacing from "../../theme/spacing";
 import { AntDesign, MaterialIcons, Feather } from "@expo/vector-icons";
 import colors from "../../theme/colors";
 import CustomText from "../../components/Text/CustomText";
 import DonateDateList from "./components/DonateDateList";
+import { useDispatch, useSelector } from "react-redux";
+import { increment, selectCount } from "../../store/reducers/counterSlice";
 
 export default ProfileScreen = () => {
+  // const dispatch = useDispatch();
+  // const count = useSelector(selectCount);
+
   return (
     <View style={styles.container}>
       <View style={styles.headerView}>
