@@ -23,13 +23,13 @@ import {
   getReactNativePersistence,
   initializeAuth,
 } from "firebase/auth/react-native";
-import { useSelector } from "react-redux";
 
 const useFirebase = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [user, setUser] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [donors, setDonors] = useState([]);
 
   const auth = getAuth();
   const app = intializeFirebase();
@@ -100,7 +100,6 @@ const useFirebase = () => {
     setIsLoading(true);
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        console.log(userCredential.user);
         if (userCredential.user) {
           setUser(userCredential.user);
           setErrorMessage("");
@@ -132,14 +131,33 @@ const useFirebase = () => {
 
   const getUserData = async (id) => {
     const q = query(collection(db, "users"), where("uid", "==", id));
-    const aa = onSnapshot(q, (querySnapshot) => {
-      list = [];
+    const snapShot = onSnapshot(q, (querySnapshot) => {
       querySnapshot.docs.forEach((item) => {
         setUserInfo({ id: item.id, ...item.data() });
       });
     });
 
-    return aa;
+    return snapShot;
+  };
+
+  const getSearchResult = (bloodGroup, division, district, subDistrict) => {
+    const q = query(
+      collection(db, "users"),
+      where("bloodGroup", "==", bloodGroup),
+      where("division", "==", division),
+      where("district", "==", district),
+      where("subDistrict", "==", subDistrict)
+    );
+
+    let list = [];
+    setDonors([]);
+    onSnapshot(q, (querySnapshot) => {
+      querySnapshot.docs.forEach((item) => {
+        list = [...list, item.data()];
+        setDonors(() => list);
+      });
+    });
+    console.log(list);
   };
 
   const updateImage = async (url) => {
@@ -171,6 +189,9 @@ const useFirebase = () => {
     userInfo,
     getUserData,
     updateImage,
+    getSearchResult,
+    donors,
+    db,
   };
 };
 

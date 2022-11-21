@@ -29,7 +29,6 @@ export default ProfileScreen = ({ navigation }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log(userInfo?.image);
     if (user) {
       getUserData(user.uid);
     }

@@ -1,18 +1,33 @@
-import { Pressable, StyleSheet, View } from "react-native";
+import { Image, Linking, Pressable, StyleSheet, View } from "react-native";
 import CustomText from "../../../components/Text/CustomText";
 import colors from "../../../theme/colors";
 import { Ionicons } from "@expo/vector-icons";
 
-export default DonorCard = () => {
+export default DonorCard = ({ donor }) => {
+  const { name, bloodGroup, donationList, image, phoneNumber } = donor;
+  const goDialPad = () => {
+    Linking.openURL(`tel:${phoneNumber}`);
+  };
   return (
     <View style={styles.donorCardContainer}>
-      <View style={styles.userImgWrapper}></View>
+      <View style={styles.userImgWrapper}>
+        {image !== "" ? (
+          <Image source={{ uri: image, height: 90 }} />
+        ) : (
+          <Image
+            style={{ height: 90, width: "100%" }}
+            source={require("../../../../assets/user-avater.png")}
+          />
+        )}
+      </View>
       <View style={styles.contentWrapper}>
         <View style={{ width: "25%" }} />
         <View style={styles.donarInfo}>
-          <CustomText style={{ color: colors.red }}>Donor Name</CustomText>
-          <CustomText preset="small">Blood Group: A+</CustomText>
-          <CustomText preset="small">Last Donation: 12-12-2022</CustomText>
+          <CustomText style={{ color: colors.red }}>{name}</CustomText>
+          <CustomText preset="small">Blood Group: {bloodGroup}</CustomText>
+          <CustomText preset="small">
+            Last Donation: {donationList[donationList.length - 1]}
+          </CustomText>
         </View>
         <Pressable
           style={{
@@ -21,7 +36,12 @@ export default DonorCard = () => {
             alignItems: "flex-start",
           }}
         >
-          <Ionicons name="call" size={24} color={colors.red} />
+          <Ionicons
+            name="call"
+            size={24}
+            color={colors.red}
+            onPress={goDialPad}
+          />
         </Pressable>
       </View>
     </View>
@@ -45,6 +65,7 @@ const styles = StyleSheet.create({
   },
   userImgWrapper: {
     height: 90,
+    overflow: "hidden",
     width: "25%",
     borderBottomLeftRadius: 5,
     borderTopRightRadius: 5,

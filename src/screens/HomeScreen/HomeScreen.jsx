@@ -13,6 +13,9 @@ import useFirebase from "../../hooks/useFirebase";
 import { useDispatch } from "react-redux";
 import { removeBloodGroup } from "../../store/reducers/addBloodGroupSlice";
 import { LocationApiService } from "../../services/divisions";
+import { showMessage } from "react-native-flash-message";
+import { addDonatorFilter } from "../../store/reducers/donorListFilterSlice";
+import { removeDonors } from "../../store/reducers/donarsListSlice";
 
 export default HomeScreen = ({ navigation }) => {
   const [division, setDivision] = useState("");
@@ -23,13 +26,15 @@ export default HomeScreen = ({ navigation }) => {
   const [locations, setLocations] = useState();
   const [districtList, setDistrictList] = useState([]);
   const [subDistrictList, setSubDistrictList] = useState([]);
+  const [donorList, setDonorList] = useState([]);
 
   const bloodGroups = ["A+", "B+", "O+", "AB+", "A-", "B-", "O-", "AB-"];
 
-  const { user, logOut } = useFirebase();
+  const { user, logOut, getSearchResult } = useFirebase();
   const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch(removeDonors());
     getLocation();
   }, [!locations]);
 
@@ -81,6 +86,35 @@ export default HomeScreen = ({ navigation }) => {
     dispatch(removeBloodGroup());
     logOut();
   };
+
+  const handleSearch = async () => {
+    if (bloodGroup && division && district) {
+      dispatch(
+        addDonatorFilter({ bloodGroup, division, district, subDistrict })
+      );
+      navigation.navigate("Search");
+    } else {
+      if (!bloodGroup) {
+        showMessage({
+          message: "",
+          description: "Select a blood group",
+          type: "danger",
+        });
+      } else if (!division) {
+        showMessage({
+          message: "",
+          description: "Select a divisin",
+          type: "danger",
+        });
+      } else {
+        showMessage({
+          message: "",
+          description: "Select a district",
+          type: "danger",
+        });
+      }
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.topReactAngel} />
@@ -97,7 +131,7 @@ export default HomeScreen = ({ navigation }) => {
           {/* Blood Group List Picker */}
           <View style={styles.selectInput}>
             <Picker
-              selectedValue={division}
+              selectedValue={bloodGroup}
               onValueChange={(itemValue) => setBloodGroup(itemValue)}
             >
               <Picker.Item label="Select Blood Group" value="" />
@@ -165,8 +199,11 @@ export default HomeScreen = ({ navigation }) => {
               </Picker>
             )}
           </View>
+          <CustomText preset="small" style={{ marginBottom: 10 }}>
+            *sub district is not required
+          </CustomText>
 
-          <Pressable>
+          <Pressable onPress={handleSearch}>
             <CustomText style={styles.searchBtn}>Search</CustomText>
           </Pressable>
         </View>
