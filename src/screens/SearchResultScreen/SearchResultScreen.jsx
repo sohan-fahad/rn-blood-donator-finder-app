@@ -1,4 +1,10 @@
-import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import {
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { selectFilterObj } from "../../store/reducers/donorListFilterSlice";
 import spacing from "../../theme/spacing";
@@ -56,7 +62,7 @@ export default SearchResultScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.headerView}>
         <Pressable style={styles.backBtn} onPress={() => navigation.goBack()}>
           <AntDesign name="arrowleft" size={24} color={colors.red} />
@@ -72,7 +78,7 @@ export default SearchResultScreen = ({ navigation }) => {
           <CustomText>No donor found!</CustomText>
         )}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

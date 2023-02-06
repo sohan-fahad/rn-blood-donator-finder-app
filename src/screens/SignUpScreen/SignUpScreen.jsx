@@ -7,6 +7,7 @@ import {
   Button,
   ScrollView,
   ActivityIndicator,
+  FlatList,
 } from "react-native";
 import { showMessage } from "react-native-flash-message";
 import colors from "../../theme/colors";
@@ -17,11 +18,16 @@ import { Picker } from "@react-native-picker/picker";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment/moment";
 import spacing from "../../theme/spacing";
-import { LocationApiService } from "../../services/divisions";
 import intializeFirebase from "../../firebase/firebase.init";
 import useFirebase from "../../hooks/useFirebase";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectBloodGroup } from "../../store/reducers/addBloodGroupSlice";
+import {
+  selectLoagingState,
+  startLoading,
+  stopLoading,
+} from "../../store/reducers/isLoadingBtnSlice";
+import { LocationApiService } from "../../services/location.service";
 
 export default SignUpScreen = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -29,24 +35,28 @@ export default SignUpScreen = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [division, setDivision] = useState("");
-  const [district, setDistrict] = useState("");
-  const [subDistrict, setSubDistrict] = useState("");
+  const [city, setCity] = useState("");
+  const [area, setArea] = useState("");
   const [donationDate, setDonationDate] = useState("");
+  const [datePickerPlaceHolder, setDatePickerPlaceHolder] = useState();
 
-  const [locations, setLocations] = useState();
-  const [districtList, setDistrictList] = useState([]);
-  const [subDistrictList, setSubDistrictList] = useState([]);
+  const [cityList, setCityList] = useState([]);
+  const [areaList, setAreaList] = useState([]);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const { createAccount } = useFirebase();
 
+  const dispatch = useDispatch();
+
   const bloodGroup = useSelector(selectBloodGroup);
+  // const isLoading = useSelector(selectLoagingState);
 
   useEffect(() => {
-    getLocation();
-    intializeFirebase();
-  }, [!locations]);
+    if (division) {
+      getCities();
+    }
+  }, [division]);
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -56,91 +66,121 @@ export default SignUpScreen = ({ navigation }) => {
     setDatePickerVisibility(false);
   };
 
-  const handleConfirm = (date) => {
-    setDonationDate(moment(date).format("DD-MM-YYYY"));
+  const handleLastDonate = (date) => {
+    setDonationDate(moment(date));
+    setDatePickerPlaceHolder(moment(date).format("DD-MM-YYYY"));
     hideDatePicker();
-  };
-
-  const handleTextInput = (text) => {
-    setName(text);
   };
 
   const handleDivision = (divisionName) => {
     if (divisionName) {
       setDivision(divisionName);
-      const filterDivision = locations.filter(
-        (location) => location.division == divisionName
-      );
-      setDistrictList(filterDivision[0].district);
     } else {
       setDivision("");
-      setDistrict("");
-      setSubDistrict("");
-      setDistrictList([]);
-      setSubDistrictList([]);
+      setCity("");
+      setArea("");
+      setCityList([]);
+      setAreaList([]);
     }
   };
 
-  const handleDistrict = (districtName) => {
-    if (districtName) {
-      setDistrict(districtName);
-      const filterSubDistrict = districtList.filter(
-        (item) => item.districtName == districtName
-      );
-
-      setSubDistrictList(filterSubDistrict[0].subDistrict);
+  const handleCity = (cityId) => {
+    if (cityId) {
+      setCity(cityId);
+      getAreas(cityId);
     } else {
-      setDistrict("");
-      setSubDistrict("");
-      setSubDistrictList([]);
+      setCity("");
+      setArea("");
+      setAreaList([]);
     }
   };
 
-  const handleSubDistrict = (subDistrict) => {
+  const handleArea = (subDistrict) => {
     if (subDistrict) {
-      setSubDistrict(subDistrict);
+      setArea(subDistrict);
     } else {
-      setSubDistrict("");
+      setArea("");
     }
   };
 
-  const getLocation = async () => {
-    const res = await LocationApiService.divisons();
-    setLocations(res);
+  const getCities = async () => {
+    try {
+      if (division) {
+        const response = await LocationApiService.getCities(division);
+        if (response.statusCode === 200) {
+          setCityList(response?.payload);
+        } else {
+          showMessage({
+            message: "",
+            description: response?.message,
+            type: "danger",
+          });
+        }
+      }
+    } catch (error) {
+      showMessage({
+        message: "",
+        description: error.message,
+        type: "danger",
+      });
+    }
+  };
+
+  const getAreas = async (id) => {
+    try {
+      if (id) {
+        const response = await LocationApiService.getAreas(id);
+        if (response.statusCode === 200) {
+          setAreaList(response?.payload);
+        } else {
+          showMessage({
+            message: "",
+            description: response?.message,
+            type: "danger",
+          });
+        }
+      }
+    } catch (error) {
+      showMessage({
+        message: "",
+        description: error.message,
+        type: "danger",
+      });
+    }
   };
 
   const userRegister = async () => {
-    setIsLoading(true);
     if (
       email &&
       password &&
       name &&
       phoneNumber &&
       division &&
-      district &&
-      subDistrict &&
+      city &&
+      area &&
       bloodGroup &&
       donationDate
     ) {
-      createAccount(
-        email,
-        password,
-        name,
-        phoneNumber,
+      setIsLoading(true);
+      const requestObj = {
+        identifier: phoneNumber,
+        firstName: name,
+        lastName: name,
+        email: email,
+        password: password,
+        bloodGroup: bloodGroup,
+        lastDonated: new Date(donationDate),
         division,
-        district,
-        subDistrict,
-        bloodGroup,
-        donationDate
-      );
+        city,
+        area,
+      };
     } else {
       showMessage({
         message: "",
-        description: "invalid email or password",
+        description: "required all inputs!",
         type: "danger",
       });
     }
-    setIsLoading(false);
   };
 
   return (
@@ -152,9 +192,6 @@ export default SignUpScreen = ({ navigation }) => {
       >
         <AntDesign name="arrowleft" size={30} color={colors.red} />
       </Pressable>
-      {/* <View style={styles.viewSvgImage}>
-        <BloodDonateVector />
-      </View> */}
       <ScrollView style={styles.inputView} showsVerticalScrollIndicator={false}>
         <Input
           style={styles.input}
@@ -180,34 +217,32 @@ export default SignUpScreen = ({ navigation }) => {
             onValueChange={(itemValue) => handleDivision(itemValue)}
           >
             <Picker.Item label="Select Division" value="" />
-            {locations?.map((location) => (
-              <Picker.Item
-                key={location.id}
-                label={location.division}
-                value={location.division}
-              />
-            ))}
+            <Picker.Item label="Dhaka" value="Dhaka" />
+            <Picker.Item label="Chittagong" value="Chittagong" />
+            <Picker.Item label="Khulna" value="Khulna" />
+            <Picker.Item label="Rajshahi" value="Rajshahi" />
+            <Picker.Item label="Barisal" value="Barisal" />
+            <Picker.Item label="Sylhet" value="Sylhet" />
+            <Picker.Item label="Mymensingh" value="Mymensingh" />
+            <Picker.Item label="Rangpur" value="Rangpur" />
           </Picker>
         </View>
 
-        {/* District List picker */}
+        {/* City List picker */}
         <View style={styles.selectInput}>
-          {districtList?.length == 0 ? (
+          {cityList?.length == 0 ? (
             <Picker enabled={false} selectedValue="">
               <Picker.Item label="Select Division First" />
             </Picker>
           ) : (
             <Picker
-              selectedValue={district}
-              onValueChange={(itemValue) => handleDistrict(itemValue)}
+              selectedValue={city}
+              onValueChange={(itemValue) => handleCity(itemValue)}
             >
-              <Picker.Item label="Select District" value="" />
-              {districtList?.map((district, index) => (
-                <Picker.Item
-                  key={index}
-                  label={district.districtName}
-                  value={district.districtName}
-                />
+              <Picker.Item label="Select City" value="" />
+
+              {cityList?.map((city, index) => (
+                <Picker.Item key={index} label={city?.name} value={city?.id} />
               ))}
             </Picker>
           )}
@@ -215,18 +250,18 @@ export default SignUpScreen = ({ navigation }) => {
 
         {/*Sub District List picker */}
         <View style={styles.selectInput}>
-          {subDistrictList.length == 0 ? (
+          {areaList.length == 0 ? (
             <Picker enabled={false}>
-              <Picker.Item label="Select District First" />
+              <Picker.Item label="Select City First" />
             </Picker>
           ) : (
             <Picker
-              selectedValue={subDistrict}
-              onValueChange={(itemValue) => handleSubDistrict(itemValue)}
+              selectedValue={area}
+              onValueChange={(itemValue) => handleArea(itemValue)}
             >
-              <Picker.Item label="Select District" value="" />
-              {subDistrictList.map((item, index) => (
-                <Picker.Item key={index} label={item} value={item} />
+              <Picker.Item label="Select Area" value="" />
+              {areaList.map((item, index) => (
+                <Picker.Item key={index} label={item?.name} value={item?.id} />
               ))}
             </Picker>
           )}
@@ -236,13 +271,15 @@ export default SignUpScreen = ({ navigation }) => {
         <View>
           <Pressable onPress={showDatePicker}>
             <CustomText style={[styles.input, { paddingVertical: 14 }]}>
-              {donationDate ? donationDate : "Pick Last Donation Date"}
+              {datePickerPlaceHolder
+                ? datePickerPlaceHolder
+                : "Pick Last Donation Date"}
             </CustomText>
           </Pressable>
           <DateTimePickerModal
             isVisible={isDatePickerVisible}
             mode="date"
-            onConfirm={handleConfirm}
+            onConfirm={handleLastDonate}
             onCancel={hideDatePicker}
           />
         </View>
@@ -253,17 +290,17 @@ export default SignUpScreen = ({ navigation }) => {
           handleTextInput={(text) => setPassword(text)}
           isPasswordInput={true}
         />
-        {!isLoading ? (
+        {isLoading === true ? (
+          <CustomText style={styles.signUpBtn}>
+            <ActivityIndicator size={23} color={colors.white} />
+          </CustomText>
+        ) : (
           <Pressable
             style={{ flex: 1, justifyContent: "flex-end" }}
             onPress={userRegister}
           >
             <CustomText style={styles.signUpBtn}>Sign Up</CustomText>
           </Pressable>
-        ) : (
-          <CustomText style={styles.signUpBtn}>
-            <ActivityIndicator color={colors.white} />
-          </CustomText>
         )}
       </ScrollView>
     </View>

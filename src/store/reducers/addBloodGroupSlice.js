@@ -8,7 +8,6 @@ export const addBloodGroupSlice = createSlice({
   reducers: {
     addBloodGroup: (state, action) => {
       state.value = action.payload;
-      console.log(state.value);
     },
     removeBloodGroup: (state) => {
       state = "";

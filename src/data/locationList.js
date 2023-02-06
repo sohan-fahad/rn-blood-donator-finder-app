@@ -31,6 +31,11 @@ export default locationsList = [
           "Bashan Char",
         ],
       },
+      {
+        districtId: 3,
+        districtName: "Chandpur",
+        subDistrict: ["Chandpur Sadar", "Haziganj"],
+      },
     ],
   },
   {
@@ -70,6 +75,19 @@ export default locationsList = [
           "Nikli",
           "Mithamain",
           "Bhairab",
+        ],
+      },
+      {
+        districtId: 6,
+        districtName: "Manikganj",
+        subDistrict: [
+          "Manikganj Sadar",
+          "Singair",
+          "Saturiya",
+          "Ghior",
+          "Shibaloy",
+          "Dowlotpur",
+          "Horirampur",
         ],
       },
     ],

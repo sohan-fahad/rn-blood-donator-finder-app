@@ -38,11 +38,6 @@ export default function App() {
   if (!fontsLoaded) {
     return <Text>Font loading...!</Text>;
   }
-  // useEffect(() => {
-  //   AsyncStorage.clear();
-  // });
-
-  // const user = false;
 
   return (
     <Provider store={store}>

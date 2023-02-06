@@ -12,10 +12,10 @@ import globalStyles from "../../theme/globalStyles";
 import useFirebase from "../../hooks/useFirebase";
 import { useDispatch } from "react-redux";
 import { removeBloodGroup } from "../../store/reducers/addBloodGroupSlice";
-import { LocationApiService } from "../../services/divisions";
 import { showMessage } from "react-native-flash-message";
 import { addDonatorFilter } from "../../store/reducers/donorListFilterSlice";
 import { removeDonors } from "../../store/reducers/donarsListSlice";
+import { LocationApiService } from "../../services/location.service";
 
 export default HomeScreen = ({ navigation }) => {
   const [division, setDivision] = useState("");
@@ -192,7 +192,7 @@ export default HomeScreen = ({ navigation }) => {
                 selectedValue={subDistrict}
                 onValueChange={(itemValue) => handleSubDistrict(itemValue)}
               >
-                <Picker.Item label="Select District" value="" />
+                <Picker.Item label="Select Sub District" value="" />
                 {subDistrictList.map((item, index) => (
                   <Picker.Item key={index} label={item} value={item} />
                 ))}
