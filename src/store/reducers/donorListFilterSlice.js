@@ -12,9 +12,10 @@ export const donorListFilterSlice = createSlice({
     removeFilter: (state) => {
       state.value = {
         bloodGroup: "",
+        donateType: "",
         division: "",
-        district: "",
-        subDistrict: "",
+        area: "",
+        city: "",
       };
     },
   },

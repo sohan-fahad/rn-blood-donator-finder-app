@@ -188,9 +188,7 @@ export default SignUpScreen = ({ navigation }) => {
             description: "Sign up successfull!",
             type: "success",
           });
-          navigation.navigate("Root", {
-            screen: "Home",
-          });
+          navigation.navigate("Home");
         } else {
           showMessage({
             message: "",

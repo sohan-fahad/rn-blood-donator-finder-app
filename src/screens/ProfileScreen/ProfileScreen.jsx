@@ -13,34 +13,36 @@ import { AntDesign, MaterialIcons, Feather } from "@expo/vector-icons";
 import colors from "../../theme/colors";
 import CustomText from "../../components/Text/CustomText";
 import DonateDateList from "./components/DonateDateList";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import useFirebase from "../../hooks/useFirebase";
 import { useEffect, useState } from "react";
 import { removeBloodGroup } from "../../store/reducers/addBloodGroupSlice";
 import * as ImagePicker from "expo-image-picker";
 import globalStyles from "../../theme/globalStyles";
-import { UserServieApi } from "../../services/user";
 import { showMessage } from "react-native-flash-message";
+import {
+  getUserInfo,
+  removeUserInfo,
+} from "../../store/reducers/userInfoSlice";
+import { removeAsyncStorageItem } from "../../utils/asyncStorage";
+import moment from "moment";
+import { UserServieApi } from "../../services/user.service";
 
 export default ProfileScreen = ({ navigation }) => {
   const [controller, setController] = useState(false);
 
-  const { user, getUserData, userInfo, logOut, updateImage } = useFirebase();
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (user) {
-      getUserData(user.uid);
-    }
-  }, [!user, controller]);
+  const userInfo = useSelector(getUserInfo);
 
   useEffect(() => {
     askForPermission();
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     dispatch(removeBloodGroup());
-    logOut();
+    dispatch(removeUserInfo());
+    await removeAsyncStorageItem("token");
+    await removeAsyncStorageItem("refreshToken");
   };
 
   const askForPermission = async () => {
@@ -60,7 +62,7 @@ export default ProfileScreen = ({ navigation }) => {
       allowsEditing: true,
       aspect: [3, 4],
       quality: 1,
-      base64: true,
+      base64: false,
     });
 
     if (result.canceled) {
@@ -72,21 +74,21 @@ export default ProfileScreen = ({ navigation }) => {
     let type = match ? `image/${match[1]}` : `image`;
 
     const response = await UserServieApi.updateImage(localUri, filename, type);
-    if (response.data.display_url) {
-      await updateImage(response.data.display_url);
-      setController(!controller);
-      showMessage({
-        message: "",
-        description: "Profile image updated!",
-        type: "success",
-      });
-    } else {
-      showMessage({
-        message: "",
-        description: "Unable to update profile image",
-        type: "danger",
-      });
-    }
+    // if (response.data.display_url) {
+    //   // await updateImage(response.data.display_url);
+    //   setController(!controller);
+    //   showMessage({
+    //     message: "",
+    //     description: "Profile image updated!",
+    //     type: "success",
+    //   });
+    // } else {
+    //   showMessage({
+    //     message: "",
+    //     description: "Unable to update profile image",
+    //     type: "danger",
+    //   });
+    // }
   };
 
   return (
@@ -106,7 +108,7 @@ export default ProfileScreen = ({ navigation }) => {
               Name:
             </CustomText>
             <CustomText style={styles.userInfoTextColor}>
-              {userInfo?.name}
+              {userInfo?.firstName}
             </CustomText>
           </View>
 
@@ -115,7 +117,6 @@ export default ProfileScreen = ({ navigation }) => {
               Address:
             </CustomText>
             <CustomText style={styles.userInfoTextColor}>
-              {userInfo?.subDistrict}, {userInfo?.district},{" "}
               {userInfo?.division}
             </CustomText>
           </View>
@@ -124,7 +125,7 @@ export default ProfileScreen = ({ navigation }) => {
               Last Donation:
             </CustomText>
             <CustomText style={styles.userInfoTextColor}>
-              {userInfo?.donationList[userInfo?.donationList.length - 1]}
+              {moment(userInfo?.lastDonated).format("DD-MM-YYYY")}
             </CustomText>
           </View>
         </View>
@@ -132,12 +133,12 @@ export default ProfileScreen = ({ navigation }) => {
           <Pressable style={styles.imgEditBtn} onPress={handleUploadImage}>
             <Feather name="edit" size={15} color={colors.white} />
           </Pressable>
-          {userInfo?.image && (
-            <Image source={{ uri: userInfo?.image, height: 200 }} />
+          {userInfo?.avatar && (
+            <Image source={{ uri: userInfo?.avatar, height: 200 }} />
           )}
         </View>
       </View>
-      <View style={styles.donationListTitle}>
+      {/* <View style={styles.donationListTitle}>
         <CustomText style={{ color: colors.red }}>Donation List</CustomText>
         <Pressable style={styles.editBtn}>
           <Feather name="edit" size={20} color={colors.red} />
@@ -150,7 +151,7 @@ export default ProfileScreen = ({ navigation }) => {
         {userInfo?.donationList.map((date, index) => (
           <DonateDateList key={index} index={index + 1} date={date} />
         ))}
-      </ScrollView>
+      </ScrollView> */}
     </SafeAreaView>
   );
 };

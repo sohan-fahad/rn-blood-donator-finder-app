@@ -20,68 +20,96 @@ import { removeUserInfo } from "../../store/reducers/userInfoSlice";
 import { removeAsyncStorageItem } from "../../utils/asyncStorage";
 
 export default HomeScreen = ({ navigation }) => {
-  const [division, setDivision] = useState("");
-  const [district, setDistrict] = useState("");
-  const [subDistrict, setSubDistrict] = useState("");
   const [bloodGroup, setBloodGroup] = useState("");
+  const [division, setDivision] = useState("");
+  const [city, setCity] = useState("");
+  const [area, setArea] = useState("");
+  const [donateType, setDonateType] = useState("");
 
-  const [locations, setLocations] = useState();
-  const [districtList, setDistrictList] = useState([]);
-  const [subDistrictList, setSubDistrictList] = useState([]);
-  const [donorList, setDonorList] = useState([]);
+  const [cityList, setCityList] = useState([]);
+  const [areaList, setAreaList] = useState([]);
 
   const bloodGroups = ["A+", "B+", "O+", "AB+", "A-", "B-", "O-", "AB-"];
 
   const { user, logOut, getSearchResult } = useFirebase();
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(removeDonors());
-    getLocation();
-  }, [!locations]);
-
   const handleDivision = (divisionName) => {
     if (divisionName) {
       setDivision(divisionName);
-      const filterDivision = locations.filter(
-        (location) => location.division == divisionName
-      );
-      setDistrictList(filterDivision[0].district);
+      getCities(divisionName);
     } else {
       setDivision("");
-      setDistrict("");
-      setSubDistrict("");
-      setDistrictList([]);
-      setSubDistrictList([]);
+      setCity("");
+      setArea("");
+      setCityList([]);
+      setAreaList([]);
     }
   };
 
-  const handleDistrict = (districtName) => {
-    if (districtName) {
-      setDistrict(districtName);
-      const filterSubDistrict = districtList.filter(
-        (item) => item.districtName == districtName
-      );
-
-      setSubDistrictList(filterSubDistrict[0].subDistrict);
+  const handleCity = (cityId) => {
+    if (cityId) {
+      setCity(cityId);
+      getAreas(cityId);
     } else {
-      setDistrict("");
-      setSubDistrict("");
-      setSubDistrictList([]);
+      setCity("");
+      setArea("");
+      setAreaList([]);
     }
   };
 
-  const handleSubDistrict = (subDistrict) => {
+  const handleArea = (subDistrict) => {
     if (subDistrict) {
-      setSubDistrict(subDistrict);
+      setArea(subDistrict);
     } else {
-      setSubDistrict("");
+      setArea("");
     }
   };
 
-  const getLocation = async () => {
-    const res = await LocationApiService.divisons();
-    setLocations(res);
+  const getCities = async (division) => {
+    try {
+      if (division) {
+        const response = await LocationApiService.getCities(division);
+        if (response.statusCode === 200) {
+          setCityList(response?.payload);
+        } else {
+          showMessage({
+            message: "",
+            description: response?.message,
+            type: "danger",
+          });
+        }
+      }
+    } catch (error) {
+      showMessage({
+        message: "",
+        description: error.message,
+        type: "danger",
+      });
+    }
+  };
+
+  const getAreas = async (id) => {
+    try {
+      if (id) {
+        const response = await LocationApiService.getAreas(id);
+        if (response.statusCode === 200) {
+          setAreaList(response?.payload);
+        } else {
+          showMessage({
+            message: "",
+            description: response?.message,
+            type: "danger",
+          });
+        }
+      }
+    } catch (error) {
+      showMessage({
+        message: "",
+        description: error.message,
+        type: "danger",
+      });
+    }
   };
 
   const handleLogout = async () => {
@@ -92,11 +120,11 @@ export default HomeScreen = ({ navigation }) => {
   };
 
   const handleSearch = async () => {
-    if (bloodGroup && division && district) {
+    if (bloodGroup && division && city) {
       dispatch(
-        addDonatorFilter({ bloodGroup, division, district, subDistrict })
+        addDonatorFilter({ bloodGroup, donateType, division, city, area })
       );
-      navigation.navigate("Search");
+      // navigation.navigate("Search");
     } else {
       if (!bloodGroup) {
         showMessage({
@@ -145,6 +173,16 @@ export default HomeScreen = ({ navigation }) => {
             </Picker>
           </View>
 
+          <View style={styles.selectInput}>
+            <Picker
+              selectedValue={donateType}
+              onValueChange={(itemValue) => setDonateType(itemValue)}
+            >
+              <Picker.Item label="Select Donation Type" value="" />
+              <Picker.Item label="Blood Donate" value="donate" />
+              <Picker.Item label="Fertilize Donate" value="fertilize" />
+            </Picker>
+          </View>
           {/* Division List Picker */}
           <View style={styles.selectInput}>
             <Picker
@@ -152,33 +190,34 @@ export default HomeScreen = ({ navigation }) => {
               onValueChange={(itemValue) => handleDivision(itemValue)}
             >
               <Picker.Item label="Select Division" value="" />
-              {locations?.map((location) => (
-                <Picker.Item
-                  key={location.id}
-                  label={location.division}
-                  value={location.division}
-                />
-              ))}
+              <Picker.Item label="Dhaka" value="Dhaka" />
+              <Picker.Item label="Chittagong" value="Chittagong" />
+              <Picker.Item label="Khulna" value="Khulna" />
+              <Picker.Item label="Rajshahi" value="Rajshahi" />
+              <Picker.Item label="Barisal" value="Barisal" />
+              <Picker.Item label="Sylhet" value="Sylhet" />
+              <Picker.Item label="Mymensingh" value="Mymensingh" />
+              <Picker.Item label="Rangpur" value="Rangpur" />
             </Picker>
           </View>
 
           {/* District List picker */}
           <View style={styles.selectInput}>
-            {districtList?.length == 0 ? (
+            {cityList?.length == 0 ? (
               <Picker enabled={false} selectedValue="">
                 <Picker.Item label="Select Division First" />
               </Picker>
             ) : (
               <Picker
-                selectedValue={district}
-                onValueChange={(itemValue) => handleDistrict(itemValue)}
+                selectedValue={city}
+                onValueChange={(itemValue) => handleCity(itemValue)}
               >
                 <Picker.Item label="Select District" value="" />
-                {districtList?.map((district, index) => (
+                {cityList?.map((city, index) => (
                   <Picker.Item
                     key={index}
-                    label={district.districtName}
-                    value={district.districtName}
+                    label={city?.name}
+                    value={city?.id}
                   />
                 ))}
               </Picker>
@@ -187,18 +226,22 @@ export default HomeScreen = ({ navigation }) => {
 
           {/*Sub District List picker */}
           <View style={styles.selectInput}>
-            {subDistrictList.length == 0 ? (
+            {areaList.length == 0 ? (
               <Picker enabled={false}>
                 <Picker.Item label="Select District First" />
               </Picker>
             ) : (
               <Picker
-                selectedValue={subDistrict}
-                onValueChange={(itemValue) => handleSubDistrict(itemValue)}
+                selectedValue={area}
+                onValueChange={(itemValue) => handleArea(itemValue)}
               >
                 <Picker.Item label="Select Sub District" value="" />
-                {subDistrictList.map((item, index) => (
-                  <Picker.Item key={index} label={item} value={item} />
+                {areaList.map((item, index) => (
+                  <Picker.Item
+                    key={index}
+                    label={item?.name}
+                    value={item?.id}
+                  />
                 ))}
               </Picker>
             )}
