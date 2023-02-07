@@ -30,6 +30,8 @@ import {
 import { LocationApiService } from "../../services/location.service";
 import { AuthApiService } from "../../services/auth.service";
 import { addUserInfo } from "../../store/reducers/userInfoSlice";
+import { setAsyncStorageValue } from "../../utils/asyncStorage";
+// import { setAsyncStorageValue } from "../../utils/asyncStorage";
 
 export default SignUpScreen = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -54,12 +56,6 @@ export default SignUpScreen = ({ navigation }) => {
   const bloodGroup = useSelector(selectBloodGroup);
   // const isLoading = useSelector(selectLoagingState);
 
-  useEffect(() => {
-    if (division) {
-      getCities();
-    }
-  }, [division]);
-
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
@@ -77,6 +73,7 @@ export default SignUpScreen = ({ navigation }) => {
   const handleDivision = (divisionName) => {
     if (divisionName) {
       setDivision(divisionName);
+      getCities(divisionName);
     } else {
       setDivision("");
       setCity("");
@@ -105,7 +102,7 @@ export default SignUpScreen = ({ navigation }) => {
     }
   };
 
-  const getCities = async () => {
+  const getCities = async (division) => {
     try {
       if (division) {
         const response = await LocationApiService.getCities(division);
@@ -177,9 +174,29 @@ export default SignUpScreen = ({ navigation }) => {
       };
       try {
         const response = await AuthApiService.register(requestObj);
+
         if (response.statusCode === 200) {
-          console.log(response);
-          dispatch(addUserInfo(response.payload));
+          dispatch(addUserInfo(response.payload?.createdUser));
+          await setAsyncStorageValue("token", response?.payload?.token);
+          await setAsyncStorageValue(
+            "refreshToken",
+            response?.payload?.refreshToken
+          );
+
+          showMessage({
+            message: "",
+            description: "Sign up successfull!",
+            type: "success",
+          });
+          navigation.navigate("Root", {
+            screen: "Home",
+          });
+        } else {
+          showMessage({
+            message: "",
+            description: response?.message,
+            type: "danger",
+          });
         }
         setIsLoading(false);
       } catch (error) {

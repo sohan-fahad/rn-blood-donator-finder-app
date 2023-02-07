@@ -10,7 +10,7 @@ export const userInfoSlice = createSlice({
       state.value = action.payload;
     },
     removeUserInfo: (state) => {
-      state = {};
+      state.value = {};
     },
   },
 });

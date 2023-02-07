@@ -16,6 +16,8 @@ import { showMessage } from "react-native-flash-message";
 import { addDonatorFilter } from "../../store/reducers/donorListFilterSlice";
 import { removeDonors } from "../../store/reducers/donarsListSlice";
 import { LocationApiService } from "../../services/location.service";
+import { removeUserInfo } from "../../store/reducers/userInfoSlice";
+import { removeAsyncStorageItem } from "../../utils/asyncStorage";
 
 export default HomeScreen = ({ navigation }) => {
   const [division, setDivision] = useState("");
@@ -82,9 +84,11 @@ export default HomeScreen = ({ navigation }) => {
     setLocations(res);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     dispatch(removeBloodGroup());
-    logOut();
+    dispatch(removeUserInfo());
+    await removeAsyncStorageItem("token");
+    await removeAsyncStorageItem("refreshToken");
   };
 
   const handleSearch = async () => {

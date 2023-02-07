@@ -11,6 +11,8 @@ import useFirebase from "../../hooks/useFirebase";
 import { async } from "@firebase/util";
 import { AuthApiService } from "../../services/auth.service";
 import { useDispatch } from "react-redux";
+import { setAsyncStorageValue } from "../../utils/asyncStorage";
+import { addUserInfo } from "../../store/reducers/userInfoSlice";
 
 export default LoginScreen = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -39,7 +41,25 @@ export default LoginScreen = ({ navigation }) => {
         const response = await AuthApiService.login(requestObj);
         console.log(response);
         if (response.statusCode === 200) {
-          dispatch(addUserInfo(response.payload));
+          dispatch(addUserInfo(response.payload?.user));
+          await setAsyncStorageValue("token", response?.payload?.token);
+          await setAsyncStorageValue(
+            "refreshToken",
+            response?.payload?.refreshToken
+          );
+
+          showMessage({
+            message: "",
+            description: "Sign up successfull!",
+            type: "success",
+          });
+          navigation.navigate("Home");
+        } else {
+          showMessage({
+            message: "",
+            description: response?.message,
+            type: "danger",
+          });
         }
         setIsLoading(false);
       } else {
