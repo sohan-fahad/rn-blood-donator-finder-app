@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 import CustomText from "../../components/Text/CustomText";
 import Input from "../../components/Text/Input";
 import BloodDonateVector from "../../svg/BloodDonateVector";
@@ -8,27 +8,52 @@ import spacing from "../../theme/spacing";
 import typography from "../../theme/typography";
 import { showMessage } from "react-native-flash-message";
 import useFirebase from "../../hooks/useFirebase";
+import { async } from "@firebase/util";
+import { AuthApiService } from "../../services/auth.service";
+import { useDispatch } from "react-redux";
 
 export default LoginScreen = ({ navigation }) => {
-  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useFirebase();
 
-  const handleEmail = (text) => {
-    setEmail(text);
+  const dispatch = useDispatch();
+
+  const handlePhoneNumber = (text) => {
+    setPhoneNumber(text);
   };
   const handlePassword = (text) => {
     setPassword(text);
   };
 
-  const handleLogin = () => {
-    if (email && password) {
-      login(email, password);
-    } else {
+  const handleLogin = async () => {
+    setIsLoading(true);
+    try {
+      if (phoneNumber && password) {
+        const requestObj = {
+          identifier: phoneNumber,
+          password,
+        };
+        // console.log(phoneNumber, password);
+        const response = await AuthApiService.login(requestObj);
+        console.log(response);
+        if (response.statusCode === 200) {
+          dispatch(addUserInfo(response.payload));
+        }
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
+        showMessage({
+          message: "",
+          description: "invalid number or password",
+          type: "danger",
+        });
+      }
+    } catch (error) {
       showMessage({
         message: "",
-        description: "invalid email or password",
+        description: error.message,
         type: "danger",
       });
     }
@@ -41,9 +66,9 @@ export default LoginScreen = ({ navigation }) => {
       </View>
       <View style={styles.inputContainer}>
         <Input
-          placeholder="Email"
-          keyboardType="email-address"
-          handleTextInput={handleEmail}
+          placeholder="Mobile number"
+          keyboardType="phone-pad"
+          handleTextInput={handlePhoneNumber}
           style={styles.input}
         />
         <Input
@@ -51,17 +76,27 @@ export default LoginScreen = ({ navigation }) => {
           handleTextInput={handlePassword}
           style={styles.input}
           secureTextEntry={true}
+          isPasswordInput={true}
         />
         <Pressable>
           <CustomText style={styles.forgotPinText}>Forgot your pin?</CustomText>
         </Pressable>
 
-        <Pressable onPress={handleLogin}>
-          <CustomText style={styles.loginBtn}>Login</CustomText>
-        </Pressable>
+        {isLoading ? (
+          <CustomText style={styles.loginBtn}>
+            <ActivityIndicator size={23} color={colors.white} />
+          </CustomText>
+        ) : (
+          <Pressable
+            style={{ flex: 1, justifyContent: "flex-end" }}
+            onPress={handleLogin}
+          >
+            <CustomText style={styles.loginBtn}>Login</CustomText>
+          </Pressable>
+        )}
         <View style={styles.footerView}>
           <CustomText>Don't have an account?</CustomText>
-          <Pressable onPress={() => navigation.navigate("SignUp")}>
+          <Pressable onPress={() => navigation.navigate("BloodPicker")}>
             <CustomText style={styles.registerFooterBtn}>Register</CustomText>
           </Pressable>
         </View>

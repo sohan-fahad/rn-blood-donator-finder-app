@@ -28,6 +28,8 @@ import {
   stopLoading,
 } from "../../store/reducers/isLoadingBtnSlice";
 import { LocationApiService } from "../../services/location.service";
+import { AuthApiService } from "../../services/auth.service";
+import { addUserInfo } from "../../store/reducers/userInfoSlice";
 
 export default SignUpScreen = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -165,15 +167,25 @@ export default SignUpScreen = ({ navigation }) => {
       const requestObj = {
         identifier: phoneNumber,
         firstName: name,
-        lastName: name,
         email: email,
         password: password,
         bloodGroup: bloodGroup,
         lastDonated: new Date(donationDate),
         division,
-        city,
-        area,
+        cityId: city,
+        areaId: area,
       };
+      try {
+        const response = await AuthApiService.register(requestObj);
+        if (response.statusCode === 200) {
+          console.log(response);
+          dispatch(addUserInfo(response.payload));
+        }
+        setIsLoading(false);
+      } catch (error) {
+        console.log(error.message);
+        setIsLoading(false);
+      }
     } else {
       showMessage({
         message: "",
