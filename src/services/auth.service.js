@@ -1,4 +1,5 @@
 import { apiUrl } from "../data/baseUrl";
+import { GetHttp } from "../utils/fetchInterceptor";
 
 export const AuthApiService = {
   register: async (requestObj) => {
@@ -23,5 +24,9 @@ export const AuthApiService = {
     });
 
     return response.json();
+  },
+  authInfo: async () => {
+    const response = await GetHttp("/auth/me");
+    return await response;
   },
 };

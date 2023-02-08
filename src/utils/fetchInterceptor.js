@@ -54,10 +54,9 @@ export const PutHttp = async (url, contentType, bodyData) => {
     if (validToken !== "") {
       const response = await fetch(`${baseUrl + url}`, {
         method: "PUT",
-        body: JSON.stringify(bodyData),
+        body: bodyData,
         headers: {
           Authorization: `Bearer ${validToken}`,
-          "Content-Type": `${contentType}`,
         },
       });
       return response.json();

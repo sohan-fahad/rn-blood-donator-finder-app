@@ -21,6 +21,7 @@ import * as ImagePicker from "expo-image-picker";
 import globalStyles from "../../theme/globalStyles";
 import { showMessage } from "react-native-flash-message";
 import {
+  addUserInfo,
   getUserInfo,
   removeUserInfo,
 } from "../../store/reducers/userInfoSlice";
@@ -28,14 +29,17 @@ import { removeAsyncStorageItem } from "../../utils/asyncStorage";
 import moment from "moment";
 import { UserServieApi } from "../../services/user.service";
 import { getTokenInfo, removeTokenInfo } from "../../store/reducers/tokenSlice";
+import mime from "mime";
+import { AuthApiService } from "../../services/auth.service";
 
 export default ProfileScreen = ({ navigation }) => {
-  const [controller, setController] = useState(false);
-
   const dispatch = useDispatch();
   const userInfo = useSelector(getUserInfo);
 
   useEffect(() => {
+    if (!userInfo?.firstName) {
+      getProfileData();
+    }
     askForPermission();
   }, []);
 
@@ -70,36 +74,44 @@ export default ProfileScreen = ({ navigation }) => {
     if (result.canceled) {
       return;
     }
-    const file = {
-      uri: result.assets[0].uri,
-      type: result.assets[0].type,
-      name: result.assets[0].uri.split("/").pop(),
-    };
-    let img = await dataURLtoFile(file, "TextTrack.jpg");
-    if (img) {
-      const response = await UserServieApi.updateImage(img, userInfo?.id);
-      console.log(response, "eee");
-    }
+    const imageUri = result.assets[0].uri;
 
-    // if (response.data.display_url) {
-    //   // await updateImage(response.data.display_url);
-    //   setController(!controller);
-    //   showMessage({
-    //     message: "",
-    //     description: "Profile image updated!",
-    //     type: "success",
-    //   });
-    // } else {
-    //   showMessage({
-    //     message: "",
-    //     description: "Unable to update profile image",
-    //     type: "danger",
-    //   });
-    // }
+    const file = {
+      uri: imageUri,
+      type: mime.getType(imageUri),
+      name: imageUri.split("/").pop(),
+    };
+
+    try {
+      const response = await UserServieApi.updateImage(file, userInfo?.id);
+      if (response.statusCode === 200) {
+        dispatch(addUserInfo(response?.payload));
+        showMessage({
+          message: "",
+          description: "Profile image updated!",
+          type: "success",
+        });
+      } else {
+        showMessage({
+          message: "",
+          description: "Unable to update profile image",
+          type: "danger",
+        });
+      }
+    } catch (error) {
+      console.log(error.message, "errror");
+    }
   };
 
-  const dataURLtoFile = (dataurl, filename) => {
-    return new File([new Blob([dataurl])], filename);
+  const getProfileData = async () => {
+    try {
+      const response = await AuthApiService.authInfo();
+      if (response?.statusCode === 200) {
+        dispatch(addUserInfo(response?.payload));
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   return (

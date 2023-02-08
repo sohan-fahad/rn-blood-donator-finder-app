@@ -3,22 +3,20 @@ import { checkToken, GetHttp, PutHttp } from "../utils/fetchInterceptor";
 
 export const UserServieApi = {
   updateImage: async (file, id) => {
-    const form = new FormData();
-    form.append("avatarImage ", file);
-    const url = `/users/${id}/avatar`;
-    const response = await PutHttp(url, "multipart/form-data", form);
-    // const response = await fetch(`${apiUrl}/users/${id}/avatr`, {
-    //   body: form,
-    //   method: "POST",
-    //   headers: {
-    //     Authorization: `Bearer ${token}`,
-    //     "Content-Type": "multipart/form-data",
-    //   },
-    // })
-    //   .then((response) => response.json())
-    //   .then((data) => console.log(data, "www"))
-    //   .catch((error) => console.error(error, "sss"));
-    return response;
+    const formData = new FormData();
+    formData.append("avatarImage", file);
+
+    const url = `${apiUrl}/users/${id}/avatar`;
+    const validToken = await checkToken();
+    const response = await fetch(url, {
+      method: "PUT",
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${validToken}`,
+      },
+    });
+    let data = await response.json();
+    return data;
   },
   getDonors: async (bloodGroup, division, city, area) => {
     const response = await GetHttp(

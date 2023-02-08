@@ -185,7 +185,7 @@ export default HomeScreen = ({ navigation }) => {
             </Picker>
           </View>
 
-          <View style={styles.selectInput}>
+          {/* <View style={styles.selectInput}>
             <Picker
               selectedValue={donateType}
               onValueChange={(itemValue) => setDonateType(itemValue)}
@@ -194,7 +194,7 @@ export default HomeScreen = ({ navigation }) => {
               <Picker.Item label="Blood Donate" value="donate" />
               <Picker.Item label="Fertilize Donate" value="fertilize" />
             </Picker>
-          </View>
+          </View> */}
           {/* Division List Picker */}
           <View style={styles.selectInput}>
             <Picker

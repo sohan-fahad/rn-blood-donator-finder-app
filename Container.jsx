@@ -28,32 +28,51 @@ import {
   getTokenInfo,
   removeTokenInfo,
 } from "./src/store/reducers/tokenSlice";
+import CustomText from "./src/components/Text/CustomText";
 
 const Stack = createNativeStackNavigator();
 
 const Container = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
   const { token } = useSelector(getTokenInfo);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!token) {
+    if (token) {
+      setIsLoading(false);
+    } else {
       checkAuth();
     }
   }, []);
 
   const checkAuth = async () => {
+    setIsLoading(true);
     const _token = await getAsyncStorageValue("token");
     const refreshToken = await getAsyncStorageValue("refreshToken");
     if (_token) {
-      const userInfo = await tokenDecoded(_token);
-      dispatch(addUserInfo(userInfo));
       dispatch(addTokenInfo({ token: _token, refreshToken }));
     } else {
-      dispatch(removeUserInfo());
       dispatch(removeTokenInfo());
     }
+    setIsLoading(false);
   };
+  if (isLoading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: colors.red,
+        }}
+      >
+        <CustomText style={{ color: "white" }}>Loading</CustomText>
+      </View>
+    );
+  }
 
   return (
     <>
