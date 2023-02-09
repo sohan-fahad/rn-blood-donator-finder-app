@@ -31,6 +31,9 @@ import { UserServieApi } from "../../services/user.service";
 import { getTokenInfo, removeTokenInfo } from "../../store/reducers/tokenSlice";
 import mime from "mime";
 import { AuthApiService } from "../../services/auth.service";
+import SettingsSvg from "../../svg/SettingsSvg";
+import EditIconSvg from "../../svg/EditIconSvg";
+import MessagesIconSvg from "../../svg/MessagesIconSvg";
 
 export default ProfileScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -161,20 +164,38 @@ export default ProfileScreen = ({ navigation }) => {
           )}
         </View>
       </View>
-      {/* <View style={styles.donationListTitle}>
+
+      <View style={styles.user_credit_wrapper}>
+        <CustomText style={{ color: colors.white }}>Credit Balance:</CustomText>
+        <CustomText style={{ color: colors.white }}>0.00</CustomText>
+      </View>
+
+      <View style={styles.menus_wrapper}>
+        <Pressable style={styles.menu_icon_wrapper}>
+          <SettingsSvg />
+          <CustomText style={{ color: colors.lightRed }}>Settings</CustomText>
+        </Pressable>
+        <Pressable style={styles.menu_icon_wrapper}>
+          <EditIconSvg />
+          <CustomText style={{ color: colors.lightRed }}>Edit</CustomText>
+        </Pressable>
+        <Pressable style={styles.menu_icon_wrapper}>
+          <MessagesIconSvg />
+          <CustomText style={{ color: colors.lightRed }}>Loves</CustomText>
+        </Pressable>
+      </View>
+      <View style={styles.donationListTitle}>
         <CustomText style={{ color: colors.red }}>Donation List</CustomText>
         <Pressable style={styles.editBtn}>
           <Feather name="edit" size={20} color={colors.red} />
           <CustomText style={{ color: colors.red, marginLeft: 5 }}>
-            Edit
+            Update
           </CustomText>
         </Pressable>
       </View>
       <ScrollView style={{ marginTop: 20 }}>
-        {userInfo?.donationList.map((date, index) => (
-          <DonateDateList key={index} index={index + 1} date={date} />
-        ))}
-      </ScrollView> */}
+        <DonateDateList index={1} date={"11-12-2023"} />
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -221,6 +242,30 @@ const styles = StyleSheet.create({
     top: 5,
     right: 5,
     zIndex: 10,
+  },
+  user_credit_wrapper: {
+    backgroundColor: colors.red,
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  menus_wrapper: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+  },
+  menu_icon_wrapper: {
+    backgroundColor: colors.darkGrey,
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderRadius: 10,
+    gap: 4,
+    paddingHorizontal: 4,
+    paddingVertical: 8,
+    width: "32%",
+    maxHeight: 80,
   },
   userInfoTextColor: {
     color: colors.white,

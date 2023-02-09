@@ -78,6 +78,7 @@ export default LoginScreen = ({ navigation }) => {
         });
       }
     } catch (error) {
+      setIsLoading(false);
       showMessage({
         message: "",
         description: error.message,
@@ -114,10 +115,7 @@ export default LoginScreen = ({ navigation }) => {
             <ActivityIndicator size={23} color={colors.white} />
           </CustomText>
         ) : (
-          <Pressable
-            style={{ flex: 1, justifyContent: "flex-end" }}
-            onPress={handleLogin}
-          >
+          <Pressable onPress={handleLogin}>
             <CustomText style={styles.loginBtn}>Login</CustomText>
           </Pressable>
         )}
