@@ -34,8 +34,13 @@ import { AuthApiService } from "../../services/auth.service";
 import SettingsSvg from "../../svg/SettingsSvg";
 import EditIconSvg from "../../svg/EditIconSvg";
 import MessagesIconSvg from "../../svg/MessagesIconSvg";
+import UpdateLastDonationData from "./components/UpdateLastDonationData";
+import UpdateUserInfoModal from "./components/UpdateUserInfoModal";
 
 export default ProfileScreen = ({ navigation }) => {
+  const [isDonationDateModal, setIsDonationDateModal] = useState(false);
+  const [isUserInfoUpdateModal, setIsUserInfoUpdateModa] = useState(false);
+
   const dispatch = useDispatch();
   const userInfo = useSelector(getUserInfo);
 
@@ -117,86 +122,111 @@ export default ProfileScreen = ({ navigation }) => {
     }
   };
 
+  const toggleDonationUpdateModal = () => {
+    setIsDonationDateModal(!isDonationDateModal);
+  };
+
+  const toggleUserInfoUpdateModal = () => {
+    setIsUserInfoUpdateModa(!isUserInfoUpdateModal);
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.headerView}>
-        <Pressable onPress={() => navigation.goBack()}>
-          <AntDesign name="arrowleft" size={24} color={colors.red} />
-        </Pressable>
-        <Pressable onPress={handleLogout}>
-          <MaterialIcons name="logout" size={24} color={colors.red} />
-        </Pressable>
-      </View>
-      <View style={styles.profileInfoWrapper}>
-        <View style={styles.infoView}>
-          <View style={{ marginBottom: 10 }}>
-            <CustomText preset="h4" style={styles.userInfoTextColor}>
-              Name:
-            </CustomText>
-            <CustomText style={styles.userInfoTextColor}>
-              {userInfo?.firstName}
-            </CustomText>
-          </View>
-
-          <View style={{ marginBottom: 10 }}>
-            <CustomText preset="h4" style={styles.userInfoTextColor}>
-              Address:
-            </CustomText>
-            <CustomText style={styles.userInfoTextColor}>
-              {userInfo?.division}
-            </CustomText>
-          </View>
-          <View style={{ marginBottom: 10 }}>
-            <CustomText preset="h4" style={styles.userInfoTextColor}>
-              Last Donation:
-            </CustomText>
-            <CustomText style={styles.userInfoTextColor}>
-              {moment(userInfo?.lastDonated).format("DD-MM-YYYY")}
-            </CustomText>
-          </View>
-        </View>
-        <View style={styles.imageView}>
-          <Pressable style={styles.imgEditBtn} onPress={handleUploadImage}>
-            <Feather name="edit" size={15} color={colors.white} />
+    <>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.headerView}>
+          <Pressable onPress={() => navigation.goBack()}>
+            <AntDesign name="arrowleft" size={24} color={colors.red} />
           </Pressable>
-          {userInfo?.avatar && (
-            <Image source={{ uri: userInfo?.avatar, height: 200 }} />
-          )}
+          <Pressable onPress={handleLogout}>
+            <MaterialIcons name="logout" size={24} color={colors.red} />
+          </Pressable>
         </View>
-      </View>
+        <View style={styles.profileInfoWrapper}>
+          <View style={styles.infoView}>
+            <View style={{ marginBottom: 10 }}>
+              <CustomText preset="h4" style={styles.userInfoTextColor}>
+                Name:
+              </CustomText>
+              <CustomText style={styles.userInfoTextColor}>
+                {userInfo?.firstName}
+              </CustomText>
+            </View>
 
-      <View style={styles.user_credit_wrapper}>
-        <CustomText style={{ color: colors.white }}>Credit Balance:</CustomText>
-        <CustomText style={{ color: colors.white }}>0.00</CustomText>
-      </View>
+            <View style={{ marginBottom: 10 }}>
+              <CustomText preset="h4" style={styles.userInfoTextColor}>
+                Address:
+              </CustomText>
+              <CustomText style={styles.userInfoTextColor}>
+                {userInfo?.division}
+              </CustomText>
+            </View>
+            <View style={{ marginBottom: 10 }}>
+              <CustomText preset="h4" style={styles.userInfoTextColor}>
+                Last Donation:
+              </CustomText>
+              <CustomText style={styles.userInfoTextColor}>
+                {moment(userInfo?.lastDonated).format("DD-MM-YYYY")}
+              </CustomText>
+            </View>
+          </View>
+          <View style={styles.imageView}>
+            <Pressable style={styles.imgEditBtn} onPress={handleUploadImage}>
+              <Feather name="edit" size={15} color={colors.white} />
+            </Pressable>
+            {userInfo?.avatar && (
+              <Image source={{ uri: userInfo?.avatar, height: 200 }} />
+            )}
+          </View>
+        </View>
 
-      <View style={styles.menus_wrapper}>
-        <Pressable style={styles.menu_icon_wrapper}>
-          <SettingsSvg />
-          <CustomText style={{ color: colors.lightRed }}>Settings</CustomText>
-        </Pressable>
-        <Pressable style={styles.menu_icon_wrapper}>
-          <EditIconSvg />
-          <CustomText style={{ color: colors.lightRed }}>Edit</CustomText>
-        </Pressable>
-        <Pressable style={styles.menu_icon_wrapper}>
-          <MessagesIconSvg />
-          <CustomText style={{ color: colors.lightRed }}>Loves</CustomText>
-        </Pressable>
-      </View>
-      <View style={styles.donationListTitle}>
-        <CustomText style={{ color: colors.red }}>Donation List</CustomText>
-        <Pressable style={styles.editBtn}>
-          <Feather name="edit" size={20} color={colors.red} />
-          <CustomText style={{ color: colors.red, marginLeft: 5 }}>
-            Update
+        <View style={styles.user_credit_wrapper}>
+          <CustomText style={{ color: colors.white }}>
+            Credit Balance:
           </CustomText>
-        </Pressable>
-      </View>
-      <ScrollView style={{ marginTop: 20 }}>
-        <DonateDateList index={1} date={"11-12-2023"} />
-      </ScrollView>
-    </SafeAreaView>
+          <CustomText style={{ color: colors.white }}>0.00</CustomText>
+        </View>
+
+        <View style={styles.menus_wrapper}>
+          <Pressable style={styles.menu_icon_wrapper}>
+            <SettingsSvg />
+            <CustomText style={{ color: colors.red }}>Settings</CustomText>
+          </Pressable>
+          <Pressable
+            style={styles.menu_icon_wrapper}
+            onPress={toggleUserInfoUpdateModal}
+          >
+            <EditIconSvg />
+            <CustomText style={{ color: colors.red }}>Edit</CustomText>
+          </Pressable>
+          <Pressable style={styles.menu_icon_wrapper}>
+            <MessagesIconSvg />
+            <CustomText style={{ color: colors.red }}>Loves</CustomText>
+          </Pressable>
+        </View>
+
+        {/* Donation history */}
+        <View style={styles.donationListTitle}>
+          <CustomText style={{ color: colors.red }}>Donation List</CustomText>
+          <Pressable style={styles.editBtn} onPress={toggleDonationUpdateModal}>
+            <Feather name="edit" size={20} color={colors.red} />
+            <CustomText style={{ color: colors.red, marginLeft: 5 }}>
+              Update
+            </CustomText>
+          </Pressable>
+        </View>
+        <ScrollView style={{ marginTop: 20 }}>
+          <DonateDateList index={1} date={"11-12-2023"} />
+        </ScrollView>
+        {/* Donation history */}
+      </SafeAreaView>
+      {isDonationDateModal && (
+        <UpdateLastDonationData closeModal={toggleDonationUpdateModal} />
+      )}
+
+      {isUserInfoUpdateModal && (
+        <UpdateUserInfoModal closeModal={toggleUserInfoUpdateModal} />
+      )}
+    </>
   );
 };
 

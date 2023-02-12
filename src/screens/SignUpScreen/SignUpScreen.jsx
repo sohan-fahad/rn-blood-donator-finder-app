@@ -30,6 +30,7 @@ import {
 import { LocationApiService } from "../../services/location.service";
 import { AuthApiService } from "../../services/auth.service";
 import { addUserInfo } from "../../store/reducers/userInfoSlice";
+import { addTokenInfo } from "../../store/reducers/tokenSlice";
 import { setAsyncStorageValue } from "../../utils/asyncStorage";
 // import { setAsyncStorageValue } from "../../utils/asyncStorage";
 
@@ -156,7 +157,6 @@ export default SignUpScreen = ({ navigation }) => {
       phoneNumber &&
       division &&
       city &&
-      area &&
       bloodGroup &&
       donationDate
     ) {

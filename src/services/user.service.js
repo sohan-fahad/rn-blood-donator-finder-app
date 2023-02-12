@@ -24,4 +24,9 @@ export const UserServieApi = {
     );
     return response;
   },
+
+  getDonationHitory: async () => {
+    const response = await GetHttp(`/users/donation-history`);
+    return response;
+  },
 };
