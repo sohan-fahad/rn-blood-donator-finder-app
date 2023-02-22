@@ -66,7 +66,7 @@ export default SignUpScreen = ({ navigation }) => {
   };
 
   const handleLastDonate = (date) => {
-    setDonationDate(moment(date));
+    setDonationDate(moment(date).format());
     setDatePickerPlaceHolder(moment(date).format("DD-MM-YYYY"));
     hideDatePicker();
   };

@@ -1,13 +1,18 @@
-import { View, StyleSheet, Pressable } from "react-native";
+import { View, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import CustomText from "../../../components/Text/CustomText";
 import CrossIcon from "../../../svg/CrossIcon";
 import colors from "../../../theme/colors";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useState } from "react";
 import moment from "moment";
+import { UserServieApi } from "../../../services/user.service";
+import { getUserInfo } from "../../../store/reducers/userInfoSlice";
+import { useSelector } from "react-redux";
+import { showMessage } from "react-native-flash-message";
 
-const UpdateLastDonationData = ({ closeModal }) => {
+const UpdateLastDonationData = ({ closeModal, getDonationHistory }) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [datePickerPlaceHolder, setDatePickerPlaceHolder] = useState("");
   const [donationDate, setDonationDate] = useState("");
 
@@ -20,9 +25,38 @@ const UpdateLastDonationData = ({ closeModal }) => {
   };
 
   const handleLastDonate = (date) => {
-    setDonationDate(moment(date));
+    setDonationDate(moment(date).format());
     setDatePickerPlaceHolder(moment(date).format("DD-MM-YYYY"));
     hideDatePicker();
+  };
+  const userInfo = useSelector(getUserInfo);
+  // console.log(userInfo)
+
+  const updateLastDonationHistory = async () => {
+    setIsLoading(true);
+    try {
+      const response = await UserServieApi.updateDonationHistory(
+        userInfo?.id,
+        donationDate
+      );
+      if (response?.success) {
+        getDonationHistory();
+        setIsLoading(false);
+        closeModal();
+        showMessage({
+          message: "",
+          description: "Last donation date updated!",
+          type: "success",
+        });
+      }
+    } catch (error) {
+      setIsLoading(false);
+      showMessage({
+        message: "",
+        description: error.message,
+        type: "danger",
+      });
+    }
   };
 
   return (
@@ -49,11 +83,19 @@ const UpdateLastDonationData = ({ closeModal }) => {
               onCancel={hideDatePicker}
             />
           </View>
-          <Pressable>
+          {isLoading === true ? (
             <View style={styles.updateBtn}>
-              <CustomText>Update</CustomText>
+              <CustomText style={styles.signUpBtn}>
+                <ActivityIndicator size={23} color={colors.white} />
+              </CustomText>
             </View>
-          </Pressable>
+          ) : (
+            <Pressable onPress={updateLastDonationHistory}>
+              <View style={styles.updateBtn}>
+                <CustomText style={{ color: colors.white }}>Update</CustomText>
+              </View>
+            </Pressable>
+          )}
         </View>
       </View>
     </View>
@@ -106,6 +148,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     flexDirection: "row",
     justifyContent: "center",
+    color: colors.white,
   },
 });
 

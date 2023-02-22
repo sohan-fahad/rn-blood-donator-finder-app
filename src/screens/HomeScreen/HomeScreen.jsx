@@ -1,4 +1,4 @@
-import { Pressable, SafeAreaView, StyleSheet, View } from "react-native";
+import { Pressable, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import LogoutIconSvg from "../../svg/LogoutIconSvg";
 import UserIconSvg from "../../svg/UserIconSvg";
@@ -237,7 +237,7 @@ export default HomeScreen = ({ navigation }) => {
           </View>
 
           {/*Sub District List picker */}
-          <View style={styles.selectInput}>
+          <ScrollView style={styles.selectInput}>
             {areaList.length == 0 ? (
               <Picker enabled={false}>
                 <Picker.Item label="Select City First" />
@@ -257,7 +257,7 @@ export default HomeScreen = ({ navigation }) => {
                 ))}
               </Picker>
             )}
-          </View>
+          </ScrollView>
           <CustomText preset="small" style={{ marginBottom: 10 }}>
             *sub district is not required
           </CustomText>

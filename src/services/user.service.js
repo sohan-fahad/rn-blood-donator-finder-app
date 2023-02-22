@@ -1,5 +1,5 @@
 import { apiUrl } from "../data/baseUrl";
-import { checkToken, GetHttp, PutHttp } from "../utils/fetchInterceptor";
+import { checkToken, GetHttp } from "../utils/fetchInterceptor";
 
 export const UserServieApi = {
   updateImage: async (file, id) => {
@@ -29,4 +29,21 @@ export const UserServieApi = {
     const response = await GetHttp(`/users/donation-history`);
     return response;
   },
+  updateDonationHistory: async(id,date)=> {
+    console.log(date)
+    const formData = new FormData();
+    formData.append("user", id);
+    formData.append("lastDonated", date);
+    const url = `${apiUrl}/users/donation-history`;
+    const validToken = await checkToken();
+    const response = await fetch(url, {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${validToken}`,
+      },
+    })
+    let data = await response.json();
+    return data;
+  }
 };
