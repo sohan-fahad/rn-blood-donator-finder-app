@@ -40,7 +40,7 @@ import UpdateUserInfoModal from "./components/UpdateUserInfoModal";
 export default ProfileScreen = ({ navigation }) => {
   const [isDonationDateModal, setIsDonationDateModal] = useState(false);
   const [isUserInfoUpdateModal, setIsUserInfoUpdateModa] = useState(false);
-  const [donationHistory, setDonationHistory]= useState([])
+  const [donationHistory, setDonationHistory] = useState([]);
 
   const dispatch = useDispatch();
   const userInfo = useSelector(getUserInfo);
@@ -49,13 +49,13 @@ export default ProfileScreen = ({ navigation }) => {
     if (!userInfo?.firstName) {
       getProfileData();
     }
-    init()
+    init();
   }, []);
 
-  const init=async()=> {
+  const init = async () => {
     await askForPermission();
-    await getDonationHistory()
-  }
+    await getDonationHistory();
+  };
 
   const handleLogout = async () => {
     dispatch(removeBloodGroup());
@@ -128,12 +128,12 @@ export default ProfileScreen = ({ navigation }) => {
     }
   };
 
-  const getDonationHistory=async()=> {
+  const getDonationHistory = async () => {
     const response = await UserServieApi.getDonationHitory();
-    if(response?.success) {
-      setDonationHistory(response?.payload)
+    if (response?.success) {
+      setDonationHistory(response?.payload);
     }
-  }
+  };
 
   const toggleDonationUpdateModal = () => {
     setIsDonationDateModal(!isDonationDateModal);
@@ -228,22 +228,36 @@ export default ProfileScreen = ({ navigation }) => {
           </Pressable>
         </View>
         <ScrollView style={{ marginTop: 20 }}>
-          {donationHistory.length>1?
-          donationHistory.map((list, index)=> <Pressable>
-          <DonateDateList key={index} index={index+1} date={moment(list?.lastDonated).format("DD-MM-YYYY")} />
-        </Pressable>)
-          :
-        <CustomText style={{ color: colors.red }}>No donation history found!</CustomText>
-      }
+          {donationHistory.length > 1 ? (
+            donationHistory.map((list, index) => (
+              <Pressable key={index}>
+                <DonateDateList
+                  key={index}
+                  index={index + 1}
+                  date={moment(list?.lastDonated).format("DD-MM-YYYY")}
+                />
+              </Pressable>
+            ))
+          ) : (
+            <CustomText style={{ color: colors.red }}>
+              No donation history found!
+            </CustomText>
+          )}
         </ScrollView>
         {/* Donation history */}
       </SafeAreaView>
       {isDonationDateModal && (
-        <UpdateLastDonationData closeModal={toggleDonationUpdateModal} getDonationHistory={getDonationHistory} />
+        <UpdateLastDonationData
+          closeModal={toggleDonationUpdateModal}
+          getDonationHistory={getDonationHistory}
+        />
       )}
 
       {isUserInfoUpdateModal && (
-        <UpdateUserInfoModal closeModal={toggleUserInfoUpdateModal} />
+        <UpdateUserInfoModal
+          closeModal={toggleUserInfoUpdateModal}
+          userInfo={userInfo}
+        />
       )}
     </>
   );

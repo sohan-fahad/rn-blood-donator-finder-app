@@ -1,4 +1,10 @@
-import { Pressable, SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
+import {
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import LogoutIconSvg from "../../svg/LogoutIconSvg";
 import UserIconSvg from "../../svg/UserIconSvg";
@@ -19,18 +25,44 @@ import { LocationApiService } from "../../services/location.service";
 import { removeUserInfo } from "../../store/reducers/userInfoSlice";
 import { removeAsyncStorageItem } from "../../utils/asyncStorage";
 import { removeTokenInfo } from "../../store/reducers/tokenSlice";
+import CustomSelect from "../../components/CustomSelect";
+import DownArrow from "../../svg/DownArrow";
 
 export default HomeScreen = ({ navigation }) => {
   const [bloodGroup, setBloodGroup] = useState("");
   const [division, setDivision] = useState("");
-  const [city, setCity] = useState("");
-  const [area, setArea] = useState("");
+  const [city, setCity] = useState({ name: "", id: "" });
+  const [area, setArea] = useState({ name: "", id: "" });
   const [donateType, setDonateType] = useState("");
 
   const [cityList, setCityList] = useState([]);
   const [areaList, setAreaList] = useState([]);
 
-  const bloodGroups = ["A+", "B+", "O+", "AB+", "A-", "B-", "O-", "AB-"];
+  const [isBloodModal, setIsBloodModal] = useState(false);
+  const [isDivisionModal, setIsDivisionModal] = useState(false);
+  const [isCityModal, setIsCityModal] = useState(false);
+  const [isAreaModal, setIsAreaModal] = useState(false);
+
+  const bloodGroups = [
+    { name: "A+", id: "A+" },
+    { name: "B+", id: "B+" },
+    { name: "O+", id: "O+" },
+    { name: "AB+", id: "AB+" },
+    { name: "A-", id: "A-" },
+    { name: "B-", id: "B-" },
+    { name: "O-", id: "O-" },
+    { name: "AB-", id: "AB-" },
+  ];
+  const divisionList = [
+    { name: "Dhaka", id: "Dhaka" },
+    { name: "Chittagong", id: "Chittagong" },
+    { name: "Khulna", id: "Khulna" },
+    { name: "Rajshahi", id: "Rajshahi" },
+    { name: "Barisal", id: "Barisal" },
+    { name: "Mymensingh", id: "Mymensingh" },
+    { name: "Sylhet", id: "Sylhet" },
+    { name: "Rangpur", id: "Rangpur" },
+  ];
 
   const dispatch = useDispatch();
 
@@ -40,36 +72,39 @@ export default HomeScreen = ({ navigation }) => {
       getCities(divisionName);
     } else {
       setDivision("");
-      setCity("");
-      setArea("");
+      setCity({});
+      setArea({});
       setCityList([]);
       setAreaList([]);
     }
   };
 
-  const handleCity = (cityId) => {
+  const handleCity = (cityId, name) => {
     if (cityId) {
-      setCity(cityId);
+      setCity({ name, id: cityId });
       getAreas(cityId);
     } else {
-      setCity("");
-      setArea("");
+      setCity({});
+      setArea({});
       setAreaList([]);
     }
   };
 
-  const handleArea = (subDistrict) => {
-    if (subDistrict) {
-      setArea(subDistrict);
+  const handleArea = (area) => {
+    if (area) {
+      setArea({ name: area?.name, id: area?.id });
     } else {
-      setArea("");
+      setArea({});
     }
   };
 
   const getCities = async (division) => {
     try {
       if (division) {
+        setCity({});
+        setArea({});
         const response = await LocationApiService.getCities(division);
+        console.log(response);
         if (response.statusCode === 200) {
           setCityList(response?.payload);
         } else {
@@ -89,10 +124,15 @@ export default HomeScreen = ({ navigation }) => {
     }
   };
 
-  const getAreas = async (id) => {
+  const getAreas = async (id, area = "") => {
     try {
       if (id) {
-        const response = await LocationApiService.getAreas(id);
+        setArea({});
+        const response = await LocationApiService.getAreas(
+          id ? id : city.id,
+          area
+        );
+        console.log(response);
         if (response.statusCode === 200) {
           setAreaList(response?.payload);
         } else {
@@ -124,7 +164,13 @@ export default HomeScreen = ({ navigation }) => {
   const handleSearch = async () => {
     if (bloodGroup && division && city) {
       dispatch(
-        addDonatorFilter({ bloodGroup, donateType, division, city, area })
+        addDonatorFilter({
+          bloodGroup,
+          donateType,
+          division,
+          city: city?.name,
+          area: area?.id,
+        })
       );
       navigation.navigate("Search");
       resetData();
@@ -159,122 +205,136 @@ export default HomeScreen = ({ navigation }) => {
     setAreaList([]);
     setCityList([]);
   };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.topReactAngel} />
-      <View style={styles.contentWrapper}>
-        <View style={styles.topViewContainer}>
-          <Pressable onPress={() => navigation.navigate("Profile")}>
-            <UserIconSvg />
-          </Pressable>
-          <Pressable onPress={() => handleLogout()}>
-            <LogoutIconSvg />
-          </Pressable>
-        </View>
-        <View style={styles.fliterContainer}>
-          {/* Blood Group List Picker */}
-          <View style={styles.selectInput}>
-            <Picker
-              selectedValue={bloodGroup}
-              onValueChange={(itemValue) => setBloodGroup(itemValue)}
-            >
-              <Picker.Item label="Select Blood Group" value="" />
-              {bloodGroups?.map((item, index) => (
-                <Picker.Item key={index} label={item} value={item} />
-              ))}
-            </Picker>
+    <>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.topReactAngel} />
+        <View style={styles.contentWrapper}>
+          <View style={styles.topViewContainer}>
+            <Pressable onPress={() => navigation.navigate("Profile")}>
+              <UserIconSvg />
+            </Pressable>
+            <Pressable onPress={() => handleLogout()}>
+              <LogoutIconSvg />
+            </Pressable>
           </View>
 
-          {/* <View style={styles.selectInput}>
-            <Picker
-              selectedValue={donateType}
-              onValueChange={(itemValue) => setDonateType(itemValue)}
-            >
-              <Picker.Item label="Select Donation Type" value="" />
-              <Picker.Item label="Blood Donate" value="donate" />
-              <Picker.Item label="Fertilize Donate" value="fertilize" />
-            </Picker>
-          </View> */}
-          {/* Division List Picker */}
-          <View style={styles.selectInput}>
-            <Picker
-              selectedValue={division}
-              onValueChange={(itemValue) => handleDivision(itemValue)}
-            >
-              <Picker.Item label="Select Division" value="" />
-              <Picker.Item label="Dhaka" value="Dhaka" />
-              <Picker.Item label="Chittagong" value="Chittagong" />
-              <Picker.Item label="Khulna" value="Khulna" />
-              <Picker.Item label="Rajshahi" value="Rajshahi" />
-              <Picker.Item label="Barisal" value="Barisal" />
-              <Picker.Item label="Sylhet" value="Sylhet" />
-              <Picker.Item label="Mymensingh" value="Mymensingh" />
-              <Picker.Item label="Rangpur" value="Rangpur" />
-            </Picker>
+          <View style={styles.fliterContainer}>
+            {/* Blood Group List Picker */}
+            <View style={styles.selectInput}>
+              <Pressable onPress={() => setIsBloodModal(true)}>
+                <View style={styles.selectOption}>
+                  <CustomText>
+                    {bloodGroup ? bloodGroup : "Select Blood Group"}
+                  </CustomText>
+                  <DownArrow width={20} height={20} />
+                </View>
+              </Pressable>
+            </View>
+
+            {/* Division List Picker */}
+            <View style={styles.selectInput}>
+              <Pressable onPress={() => setIsDivisionModal(true)}>
+                <View style={styles.selectOption}>
+                  <CustomText>
+                    {division ? division : "Select Division"}
+                  </CustomText>
+                  <DownArrow width={20} height={20} />
+                </View>
+              </Pressable>
+            </View>
+
+            {/* District List picker */}
+            <View style={styles.selectInput}>
+              {!division ? (
+                <CustomText style={styles.selectOption}>
+                  Select Division First
+                </CustomText>
+              ) : (
+                <Pressable onPress={() => setIsCityModal(true)}>
+                  <View style={styles.selectOption}>
+                    <CustomText>
+                      {city?.name ? city?.name : "Select District"}
+                    </CustomText>
+                    <DownArrow width={20} height={20} />
+                  </View>
+                </Pressable>
+              )}
+            </View>
+
+            {/*Sub District List picker */}
+            {/* District List picker */}
+            <View style={styles.selectInput}>
+              {!city.name ? (
+                <CustomText style={styles.selectOption}>
+                  Select City First
+                </CustomText>
+              ) : (
+                <Pressable onPress={() => setIsAreaModal(true)}>
+                  <View style={styles.selectOption}>
+                    <CustomText>
+                      {area?.name
+                        ? area?.name.slice(0, 20) + "..."
+                        : "Select Area"}
+                    </CustomText>
+                    <DownArrow width={20} height={20} />
+                  </View>
+                </Pressable>
+              )}
+            </View>
+            <CustomText preset="small" style={{ marginBottom: 10 }}>
+              *sub district is not required
+            </CustomText>
+
+            <Pressable onPress={handleSearch}>
+              <CustomText style={styles.searchBtn}>Search</CustomText>
+            </Pressable>
           </View>
 
-          {/* District List picker */}
-          <View style={styles.selectInput}>
-            {cityList?.length == 0 ? (
-              <Picker enabled={false} selectedValue="">
-                <Picker.Item label="Select Division First" />
-              </Picker>
-            ) : (
-              <Picker
-                selectedValue={city}
-                onValueChange={(itemValue) => handleCity(itemValue)}
-              >
-                <Picker.Item label="Select City" value="" />
-                {cityList?.map((city, index) => (
-                  <Picker.Item
-                    key={index}
-                    label={city?.name}
-                    value={city?.id}
-                  />
-                ))}
-              </Picker>
-            )}
+          <View style={styles.footerView}>
+            <HomeBloodDonarSvg />
+            <CustomText preset="h4" style={styles.footerText}>
+              Search donator by giving blood group and place information
+            </CustomText>
           </View>
-
-          {/*Sub District List picker */}
-          <ScrollView style={styles.selectInput}>
-            {areaList.length == 0 ? (
-              <Picker enabled={false}>
-                <Picker.Item label="Select City First" />
-              </Picker>
-            ) : (
-              <Picker
-                selectedValue={area}
-                onValueChange={(itemValue) => handleArea(itemValue)}
-              >
-                <Picker.Item label="Select Area" value="" />
-                {areaList.map((item, index) => (
-                  <Picker.Item
-                    key={index}
-                    label={item?.name}
-                    value={item?.id}
-                  />
-                ))}
-              </Picker>
-            )}
-          </ScrollView>
-          <CustomText preset="small" style={{ marginBottom: 10 }}>
-            *sub district is not required
-          </CustomText>
-
-          <Pressable onPress={handleSearch}>
-            <CustomText style={styles.searchBtn}>Search</CustomText>
-          </Pressable>
         </View>
+      </SafeAreaView>
+      {isBloodModal && (
+        <CustomSelect
+          elements={bloodGroups}
+          handleSelect={(item) => setBloodGroup(item?.name)}
+          closeModal={() => setIsBloodModal(false)}
+        />
+      )}
 
-        <View style={styles.footerView}>
-          <HomeBloodDonarSvg />
-          <CustomText preset="h4" style={styles.footerText}>
-            Search donator by giving blood group and place information
-          </CustomText>
-        </View>
-      </View>
-    </SafeAreaView>
+      {isDivisionModal && (
+        <CustomSelect
+          elements={divisionList}
+          handleSelect={(item) => handleDivision(item?.name)}
+          closeModal={() => setIsDivisionModal(false)}
+        />
+      )}
+
+      {isCityModal && (
+        <CustomSelect
+          elements={cityList}
+          handleSelect={(item) => handleCity(item?.id, item?.name)}
+          closeModal={() => setIsCityModal(false)}
+          isSearch={true}
+        />
+      )}
+
+      {isAreaModal && (
+        <CustomSelect
+          elements={areaList}
+          handleSelect={(item) => handleArea(item)}
+          closeModal={() => setIsAreaModal(false)}
+          isSearch={true}
+          handleSearch={(text) => getAreas("", text)}
+        />
+      )}
+    </>
   );
 };
 
@@ -295,6 +355,7 @@ const styles = StyleSheet.create({
   },
   contentWrapper: {
     padding: spacing[5],
+    position: "relative",
   },
   topViewContainer: {
     flexDirection: "row",
@@ -321,6 +382,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 5,
     marginBottom: 10,
+  },
+  selectOption: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 12,
   },
   searchBtn: {
     backgroundColor: colors.red,

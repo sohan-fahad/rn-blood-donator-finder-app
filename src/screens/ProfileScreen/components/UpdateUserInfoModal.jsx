@@ -1,21 +1,30 @@
 import { Picker } from "@react-native-picker/picker";
 import { useState } from "react";
-import { Pressable, ScrollView, TextInput } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  TextInput,
+} from "react-native";
 import { StyleSheet } from "react-native";
 import { View } from "react-native";
 import CrossIcon from "../../../svg/CrossIcon";
 import colors from "../../../theme/colors";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment";
+import { UserServieApi } from "../../../services/user.service";
+import CustomText from "../../../components/Text/CustomText";
 
-const UpdateUserInfoModal = ({ closeModal }) => {
-  const [bloodGroup, setBloodGroup] = useState("");
-  const [gender, setGender] = useState("");
-  const [height, setHeight] = useState(0);
-  const [weight, setWeight] = useState(0);
-  const [dob, setDob] = useState("");
+const UpdateUserInfoModal = ({ closeModal, userInfo }) => {
+  const [bloodGroup, setBloodGroup] = useState(userInfo?.bloodGroup);
+  const [gender, setGender] = useState(userInfo?.gender);
+  const [height, setHeight] = useState(userInfo?.height || 0);
+  const [weight, setWeight] = useState(userInfo?.weight || 0);
+  const [dob, setDob] = useState(userInfo?.dob || "");
+  const [name, setName] = useState(userInfo?.firstName);
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [datePickerPlaceHolder, setDatePickerPlaceHolder] = useState("");
 
   const showDatePicker = () => {
@@ -27,9 +36,28 @@ const UpdateUserInfoModal = ({ closeModal }) => {
   };
 
   const handleDateOfBirth = (date) => {
-    setDob(moment(date));
+    setDob(moment(date).format());
     setDatePickerPlaceHolder(moment(date).format("DD-MM-YYYY"));
     hideDatePicker();
+  };
+
+  const updateInfo = async () => {
+    setIsLoading(true);
+    try {
+      const payload = {
+        firstName: name,
+        bloodGroup,
+        gender,
+        dob,
+        height,
+        weight,
+      };
+      const response = await UserServieApi.updateInfo(payload, userInfo?.id);
+      console.log(response);
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -50,6 +78,7 @@ const UpdateUserInfoModal = ({ closeModal }) => {
             placeholder="Enter Name"
             handleTextInput={(text) => setName(text)}
             autoCapitalize="words"
+            defaultValue={name}
           />
 
           <View style={styles.selectInput}>
@@ -112,6 +141,15 @@ const UpdateUserInfoModal = ({ closeModal }) => {
               onCancel={hideDatePicker}
             />
           </View>
+          {isLoading === true ? (
+            <CustomText style={styles.updateBtn}>
+              <ActivityIndicator size={23} color={colors.white} />
+            </CustomText>
+          ) : (
+            <Pressable onPress={updateInfo}>
+              <CustomText style={styles.updateBtn}>Update</CustomText>
+            </Pressable>
+          )}
         </ScrollView>
       </View>
     </View>
@@ -166,6 +204,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 5,
     marginBottom: 10,
+  },
+  updateBtn: {
+    backgroundColor: colors.red,
+    padding: 15,
+    borderRadius: 5,
+    color: colors.white,
+    textAlign: "center",
   },
 });
 

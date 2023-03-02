@@ -39,6 +39,7 @@ const UpdateLastDonationData = ({ closeModal, getDonationHistory }) => {
         userInfo?.id,
         donationDate
       );
+      console.log(response);
       if (response?.success) {
         getDonationHistory();
         setIsLoading(false);

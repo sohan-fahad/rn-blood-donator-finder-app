@@ -29,21 +29,31 @@ export const UserServieApi = {
     const response = await GetHttp(`/users/donation-history`);
     return response;
   },
-  updateDonationHistory: async(id,date)=> {
-    console.log(date)
-    const formData = new FormData();
-    formData.append("user", id);
-    formData.append("lastDonated", date);
+  updateDonationHistory: async (id, date) => {
     const url = `${apiUrl}/users/donation-history`;
     const validToken = await checkToken();
     const response = await fetch(url, {
       method: "POST",
-      body: formData,
+      body: JSON.stringify({ user: id, lastDonated: date }),
+      headers: {
+        Authorization: `Bearer ${validToken}`,
+        "content-type": "application/json",
+      },
+    });
+    let data = await response.json();
+    return data;
+  },
+  updateInfo: async (payloda, id) => {
+    const url = `${apiUrl}/users/${id}`;
+    const validToken = await checkToken();
+    const response = await fetch(url, {
+      method: "PUT",
+      body: JSON.stringify(payloda),
       headers: {
         Authorization: `Bearer ${validToken}`,
       },
-    })
+    });
     let data = await response.json();
     return data;
-  }
+  },
 };

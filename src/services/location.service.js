@@ -13,8 +13,10 @@ export const LocationApiService = {
     const response = await fetch(`${baseUrl}/cities?division=${division}`);
     return response.json();
   },
-  getAreas: async (cityId) => {
-    const response = await fetch(`${baseUrl}/areas?city=${cityId}`);
+  getAreas: async (cityId, searchTerm = "") => {
+    const response = await fetch(
+      `${baseUrl}/areas?city=${cityId}&take=50&searchTerm=${searchTerm}`
+    );
     return response.json();
   },
 };
