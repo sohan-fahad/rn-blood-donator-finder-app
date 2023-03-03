@@ -6,6 +6,7 @@ import donorFilterReducer from "./reducers/donorListFilterSlice";
 import loadingBtnReducer from "./reducers/isLoadingBtnSlice";
 import userInfoReducer from "./reducers/userInfoSlice";
 import tokenInfoReducer from "./reducers/tokenSlice";
+import addAreaListReducer from "./reducers/addAreaListSlice";
 
 const rootReducer = combineReducers({
   counter: counterReducer,
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
   btnLoaging: loadingBtnReducer,
   addUserInfo: userInfoReducer,
   addTokenInfo: tokenInfoReducer,
+  areaList: addAreaListReducer,
 });
 
 const store = configureStore({

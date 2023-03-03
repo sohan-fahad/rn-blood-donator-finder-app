@@ -25,8 +25,8 @@ export const UserServieApi = {
     return response;
   },
 
-  getDonationHitory: async () => {
-    const response = await GetHttp(`/users/donation-history`);
+  getDonationHitory: async (id) => {
+    const response = await GetHttp(`/users/${id}/donation-history`);
     return response;
   },
   updateDonationHistory: async (id, date) => {
@@ -51,6 +51,7 @@ export const UserServieApi = {
       body: JSON.stringify(payloda),
       headers: {
         Authorization: `Bearer ${validToken}`,
+        "content-type": "application/json",
       },
     });
     let data = await response.json();

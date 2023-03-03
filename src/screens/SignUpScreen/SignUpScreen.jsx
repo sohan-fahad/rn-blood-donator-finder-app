@@ -32,6 +32,15 @@ import { AuthApiService } from "../../services/auth.service";
 import { addUserInfo } from "../../store/reducers/userInfoSlice";
 import { addTokenInfo } from "../../store/reducers/tokenSlice";
 import { setAsyncStorageValue } from "../../utils/asyncStorage";
+import {
+  addAreas,
+  getAreaList,
+  removeAreas,
+} from "../../store/reducers/addAreaListSlice";
+import CustomSelect from "../../components/CustomSelect";
+import DownArrow from "../../svg/DownArrow";
+import globalStyles from "../../theme/globalStyles";
+import AreaPcker from "../../components/Picker/AreaPicker";
 // import { setAsyncStorageValue } from "../../utils/asyncStorage";
 
 export default SignUpScreen = ({ navigation }) => {
@@ -40,17 +49,32 @@ export default SignUpScreen = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [division, setDivision] = useState("");
-  const [city, setCity] = useState("");
-  const [area, setArea] = useState("");
+  const [city, setCity] = useState({ name: "", id: "" });
+  const [area, setArea] = useState({ name: "", id: "" });
   const [donationDate, setDonationDate] = useState("");
   const [datePickerPlaceHolder, setDatePickerPlaceHolder] = useState();
 
   const [cityList, setCityList] = useState([]);
-  const [areaList, setAreaList] = useState([]);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDivisionModal, setIsDivisionModal] = useState(false);
+  const [isCityModal, setIsCityModal] = useState(false);
+  const [isAreaModal, setIsAreaModal] = useState(false);
 
   const { createAccount } = useFirebase();
+
+  const divisionList = [
+    { name: "Dhaka", id: "Dhaka" },
+    { name: "Chittagong", id: "Chittagong" },
+    { name: "Khulna", id: "Khulna" },
+    { name: "Rajshahi", id: "Rajshahi" },
+    { name: "Barisal", id: "Barisal" },
+    { name: "Mymensingh", id: "Mymensingh" },
+    { name: "Sylhet", id: "Sylhet" },
+    { name: "Rangpur", id: "Rangpur" },
+  ];
+
+  const areaList = useSelector(getAreaList);
 
   const dispatch = useDispatch();
 
@@ -80,26 +104,26 @@ export default SignUpScreen = ({ navigation }) => {
       setCity("");
       setArea("");
       setCityList([]);
-      setAreaList([]);
+      dispatch(removeAreas());
     }
   };
 
-  const handleCity = (cityId) => {
+  const handleCity = (cityId, name) => {
     if (cityId) {
-      setCity(cityId);
+      setCity({ name, id: cityId });
       getAreas(cityId);
     } else {
-      setCity("");
-      setArea("");
-      setAreaList([]);
+      setCity({});
+      setArea({});
+      dispatch(removeAreas());
     }
   };
 
-  const handleArea = (subDistrict) => {
-    if (subDistrict) {
-      setArea(subDistrict);
+  const handleArea = (area) => {
+    if (area) {
+      setArea({ name: area?.name, id: area?.id });
     } else {
-      setArea("");
+      setArea({});
     }
   };
 
@@ -126,12 +150,16 @@ export default SignUpScreen = ({ navigation }) => {
     }
   };
 
-  const getAreas = async (id) => {
+  const getAreas = async (id, area = "") => {
     try {
-      if (id) {
-        const response = await LocationApiService.getAreas(id);
+      if (id || city.id) {
+        const response = await LocationApiService.getAreas(
+          id ? id : city.id,
+          area
+        );
         if (response.statusCode === 200) {
-          setAreaList(response?.payload);
+          dispatch(addAreas(response?.payload));
+          // setAreaList(response?.payload);
         } else {
           showMessage({
             message: "",
@@ -167,10 +195,10 @@ export default SignUpScreen = ({ navigation }) => {
         email: email,
         password: password,
         bloodGroup: bloodGroup,
-        lastDonated: new Date(donationDate),
+        lastDonated: moment(donationDate).format(),
         division,
-        cityId: city,
-        areaId: area,
+        cityId: city.id,
+        areaId: area.id,
       };
       try {
         const response = await AuthApiService.register(requestObj);
@@ -217,131 +245,156 @@ export default SignUpScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.topRedCircleView} />
-      <Pressable
-        style={styles.backArrowView}
-        onPress={() => navigation.goBack()}
-      >
-        <AntDesign name="arrowleft" size={30} color={colors.red} />
-      </Pressable>
-      <ScrollView style={styles.inputView} showsVerticalScrollIndicator={false}>
-        <Input
-          style={styles.input}
-          placeholder="Enter Name"
-          handleTextInput={(text) => setName(text)}
-          autoCapitalize="words"
-        />
-        <Input
-          style={styles.input}
-          placeholder="Enter Email"
-          handleTextInput={(text) => setEmail(text)}
-          keyboardType="email-address"
-        />
-        <Input
-          style={styles.input}
-          placeholder="Enter Phone Number"
-          handleTextInput={(text) => setPhoneNumber(text)}
-          keyboardType="phone-pad"
-        />
-        <View style={styles.selectInput}>
-          <Picker
-            selectedValue={division}
-            onValueChange={(itemValue) => handleDivision(itemValue)}
-          >
-            <Picker.Item label="Select Division" value="" />
-            <Picker.Item label="Dhaka" value="Dhaka" />
-            <Picker.Item label="Chittagong" value="Chittagong" />
-            <Picker.Item label="Khulna" value="Khulna" />
-            <Picker.Item label="Rajshahi" value="Rajshahi" />
-            <Picker.Item label="Barisal" value="Barisal" />
-            <Picker.Item label="Sylhet" value="Sylhet" />
-            <Picker.Item label="Mymensingh" value="Mymensingh" />
-            <Picker.Item label="Rangpur" value="Rangpur" />
-          </Picker>
-        </View>
-
-        {/* City List picker */}
-        <View style={styles.selectInput}>
-          {cityList?.length == 0 ? (
-            <Picker enabled={false} selectedValue="">
-              <Picker.Item label="Select Division First" />
-            </Picker>
-          ) : (
-            <Picker
-              selectedValue={city}
-              onValueChange={(itemValue) => handleCity(itemValue)}
-            >
-              <Picker.Item label="Select City" value="" />
-
-              {cityList?.map((city, index) => (
-                <Picker.Item key={index} label={city?.name} value={city?.id} />
-              ))}
-            </Picker>
-          )}
-        </View>
-
-        {/*Sub District List picker */}
-        <View style={styles.selectInput}>
-          {areaList.length == 0 ? (
-            <Picker enabled={false}>
-              <Picker.Item label="Select City First" />
-            </Picker>
-          ) : (
-            <Picker
-              selectedValue={area}
-              onValueChange={(itemValue) => handleArea(itemValue)}
-            >
-              <Picker.Item label="Select Area" value="" />
-              {areaList.map((item, index) => (
-                <Picker.Item key={index} label={item?.name} value={item?.id} />
-              ))}
-            </Picker>
-          )}
-        </View>
-
-        {/* Date Picker */}
-        <View>
-          <Pressable onPress={showDatePicker}>
-            <CustomText style={[styles.input, { paddingVertical: 14 }]}>
-              {datePickerPlaceHolder
-                ? datePickerPlaceHolder
-                : "Pick Last Donation Date"}
-            </CustomText>
-          </Pressable>
-          <DateTimePickerModal
-            isVisible={isDatePickerVisible}
-            mode="date"
-            onConfirm={handleLastDonate}
-            onCancel={hideDatePicker}
+    <>
+      <View style={styles.container}>
+        <View style={styles.topRedCircleView} />
+        <Pressable
+          style={styles.backArrowView}
+          onPress={() => navigation.goBack()}
+        >
+          <AntDesign name="arrowleft" size={30} color={colors.red} />
+        </Pressable>
+        <ScrollView
+          style={styles.inputView}
+          showsVerticalScrollIndicator={false}
+        >
+          <Input
+            style={styles.input}
+            placeholder="Enter Name"
+            handleTextInput={(text) => setName(text)}
+            autoCapitalize="words"
           />
-        </View>
+          <Input
+            style={styles.input}
+            placeholder="Enter Email"
+            handleTextInput={(text) => setEmail(text)}
+            keyboardType="email-address"
+          />
+          <Input
+            style={styles.input}
+            placeholder="Enter Phone Number"
+            handleTextInput={(text) => setPhoneNumber(text)}
+            keyboardType="phone-pad"
+          />
 
-        <Input
-          style={styles.input}
-          placeholder="Enter Password"
-          handleTextInput={(text) => setPassword(text)}
-          isPasswordInput={true}
+          {/* Division List Picker */}
+          <View style={styles.selectInput}>
+            <Pressable onPress={() => setIsDivisionModal(true)}>
+              <View style={styles.selectOption}>
+                <CustomText>
+                  {division ? division : "Select Division"}
+                </CustomText>
+                <DownArrow width={20} height={20} />
+              </View>
+            </Pressable>
+          </View>
+
+          {/* District List picker */}
+          <View style={styles.selectInput}>
+            {!division ? (
+              <CustomText style={styles.selectOption}>
+                Select Division First
+              </CustomText>
+            ) : (
+              <Pressable onPress={() => setIsCityModal(true)}>
+                <View style={styles.selectOption}>
+                  <CustomText>
+                    {city?.name ? city?.name : "Select District"}
+                  </CustomText>
+                  <DownArrow width={20} height={20} />
+                </View>
+              </Pressable>
+            )}
+          </View>
+
+          {/*Sub District List picker */}
+          <View style={styles.selectInput}>
+            {!city.name ? (
+              <CustomText style={styles.selectOption}>
+                Select City First
+              </CustomText>
+            ) : (
+              <Pressable onPress={() => setIsAreaModal(true)}>
+                <View style={styles.selectOption}>
+                  <CustomText>
+                    {area?.name
+                      ? area?.name.slice(0, 20) + "..."
+                      : "Select Area"}
+                  </CustomText>
+                  <DownArrow width={20} height={20} />
+                </View>
+              </Pressable>
+            )}
+          </View>
+
+          {/* Date Picker */}
+          <View>
+            <Pressable onPress={showDatePicker}>
+              <CustomText style={[styles.input, { paddingVertical: 14 }]}>
+                {datePickerPlaceHolder
+                  ? datePickerPlaceHolder
+                  : "Pick Last Donation Date"}
+              </CustomText>
+            </Pressable>
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="date"
+              onConfirm={handleLastDonate}
+              onCancel={hideDatePicker}
+            />
+          </View>
+
+          <Input
+            style={styles.input}
+            placeholder="Enter Password"
+            handleTextInput={(text) => setPassword(text)}
+            isPasswordInput={true}
+          />
+          {isLoading === true ? (
+            <CustomText style={styles.signUpBtn}>
+              <ActivityIndicator size={23} color={colors.white} />
+            </CustomText>
+          ) : (
+            <Pressable
+              style={{ flex: 1, justifyContent: "flex-end" }}
+              onPress={userRegister}
+            >
+              <CustomText style={styles.signUpBtn}>Sign Up</CustomText>
+            </Pressable>
+          )}
+        </ScrollView>
+      </View>
+
+      {isDivisionModal && (
+        <CustomSelect
+          elements={divisionList}
+          handleSelect={(item) => handleDivision(item?.name)}
+          closeModal={() => setIsDivisionModal(false)}
         />
-        {isLoading === true ? (
-          <CustomText style={styles.signUpBtn}>
-            <ActivityIndicator size={23} color={colors.white} />
-          </CustomText>
-        ) : (
-          <Pressable
-            style={{ flex: 1, justifyContent: "flex-end" }}
-            onPress={userRegister}
-          >
-            <CustomText style={styles.signUpBtn}>Sign Up</CustomText>
-          </Pressable>
-        )}
-      </ScrollView>
-    </View>
+      )}
+
+      {isCityModal && (
+        <CustomSelect
+          elements={cityList}
+          handleSelect={(item) => handleCity(item?.id, item?.name)}
+          closeModal={() => setIsCityModal(false)}
+        />
+      )}
+
+      {isAreaModal && (
+        <AreaPcker
+          handleSelect={(item) => handleArea(item)}
+          closeModal={() => setIsAreaModal(false)}
+          cityId={city.id}
+        />
+      )}
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    ...globalStyles.adroidSafeArea,
     flex: 1,
     width: "100%",
     position: "relative",
@@ -373,7 +426,7 @@ const styles = StyleSheet.create({
   input: {
     borderColor: colors.red,
     borderWidth: 0.5,
-    paddingVertical: 14,
+    paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 5,
     marginBottom: 10,
@@ -385,6 +438,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 5,
     marginBottom: 10,
+  },
+  selectOption: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 12,
   },
   signUpBtn: {
     backgroundColor: colors.red,

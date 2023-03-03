@@ -9,6 +9,7 @@ export default Input = ({
   handleTextInput,
   keyboardType = "default",
   autoCapitalize = "",
+  defaultValue = "" | 0,
 }) => {
   const textStyle = StyleSheet.compose(presets[preset], style);
   return (
@@ -20,6 +21,7 @@ export default Input = ({
       keyboardType={keyboardType}
       autoCapitalize={autoCapitalize}
       autoCorrect={false}
+      defaultValue={defaultValue}
     />
   );
 };

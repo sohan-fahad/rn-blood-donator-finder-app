@@ -16,7 +16,7 @@ import typography from "../../theme/typography";
 import HomeBloodDonarSvg from "../../svg/HomeBloodDonar";
 import globalStyles from "../../theme/globalStyles";
 import useFirebase from "../../hooks/useFirebase";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { removeBloodGroup } from "../../store/reducers/addBloodGroupSlice";
 import { showMessage } from "react-native-flash-message";
 import { addDonatorFilter } from "../../store/reducers/donorListFilterSlice";
@@ -27,6 +27,12 @@ import { removeAsyncStorageItem } from "../../utils/asyncStorage";
 import { removeTokenInfo } from "../../store/reducers/tokenSlice";
 import CustomSelect from "../../components/CustomSelect";
 import DownArrow from "../../svg/DownArrow";
+import {
+  addAreas,
+  getAreaList,
+  removeAreas,
+} from "../../store/reducers/addAreaListSlice";
+import AreaPcker from "../../components/Picker/AreaPicker";
 
 export default HomeScreen = ({ navigation }) => {
   const [bloodGroup, setBloodGroup] = useState("");
@@ -36,7 +42,6 @@ export default HomeScreen = ({ navigation }) => {
   const [donateType, setDonateType] = useState("");
 
   const [cityList, setCityList] = useState([]);
-  const [areaList, setAreaList] = useState([]);
 
   const [isBloodModal, setIsBloodModal] = useState(false);
   const [isDivisionModal, setIsDivisionModal] = useState(false);
@@ -64,6 +69,10 @@ export default HomeScreen = ({ navigation }) => {
     { name: "Rangpur", id: "Rangpur" },
   ];
 
+  // const areaList = [];
+
+  // const a = useSelector((state) => console.log(state));
+
   const dispatch = useDispatch();
 
   const handleDivision = (divisionName) => {
@@ -75,7 +84,7 @@ export default HomeScreen = ({ navigation }) => {
       setCity({});
       setArea({});
       setCityList([]);
-      setAreaList([]);
+      dispatch(removeAreas());
     }
   };
 
@@ -86,7 +95,7 @@ export default HomeScreen = ({ navigation }) => {
     } else {
       setCity({});
       setArea({});
-      setAreaList([]);
+      dispatch(removeAreas());
     }
   };
 
@@ -104,7 +113,6 @@ export default HomeScreen = ({ navigation }) => {
         setCity({});
         setArea({});
         const response = await LocationApiService.getCities(division);
-        console.log(response);
         if (response.statusCode === 200) {
           setCityList(response?.payload);
         } else {
@@ -126,15 +134,14 @@ export default HomeScreen = ({ navigation }) => {
 
   const getAreas = async (id, area = "") => {
     try {
-      if (id) {
-        setArea({});
+      if (id || city.id) {
         const response = await LocationApiService.getAreas(
           id ? id : city.id,
           area
         );
-        console.log(response);
         if (response.statusCode === 200) {
-          setAreaList(response?.payload);
+          dispatch(addAreas(response?.payload));
+          // setAreaList(response?.payload);
         } else {
           showMessage({
             message: "",
@@ -168,7 +175,7 @@ export default HomeScreen = ({ navigation }) => {
           bloodGroup,
           donateType,
           division,
-          city: city?.name,
+          city: city?.id,
           area: area?.id,
         })
       );
@@ -202,7 +209,7 @@ export default HomeScreen = ({ navigation }) => {
     setDivision("");
     setArea("");
     setBloodGroup("");
-    setAreaList([]);
+    dispatch(removeAreas());
     setCityList([]);
   };
 
@@ -264,7 +271,6 @@ export default HomeScreen = ({ navigation }) => {
             </View>
 
             {/*Sub District List picker */}
-            {/* District List picker */}
             <View style={styles.selectInput}>
               {!city.name ? (
                 <CustomText style={styles.selectOption}>
@@ -326,12 +332,10 @@ export default HomeScreen = ({ navigation }) => {
       )}
 
       {isAreaModal && (
-        <CustomSelect
-          elements={areaList}
+        <AreaPcker
           handleSelect={(item) => handleArea(item)}
           closeModal={() => setIsAreaModal(false)}
-          isSearch={true}
-          handleSearch={(text) => getAreas("", text)}
+          cityId={city.id}
         />
       )}
     </>

@@ -57,13 +57,13 @@ const CustomSelect = ({
             placeholder="Seerch here"
           />
         )}
-        <ScrollView style={{ width: "100%" }}>
+        <View style={{ width: "100%" }}>
           <FlatList
             data={elementsData}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
           />
-        </ScrollView>
+        </View>
       </View>
     </View>
   );
@@ -86,11 +86,12 @@ const styles = StyleSheet.create({
     padding: 30,
     backgroundColor: colors.white,
     width: "95%",
-    height: "95%",
+    maxHeight: "95%",
     borderRadius: 5,
     position: "relative",
     justifyContent: "center",
     alignItems: "center",
+    flexDirection: "column",
   },
   searchInput: {
     borderWidth: 1,

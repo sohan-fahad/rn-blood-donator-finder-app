@@ -46,13 +46,11 @@ export default ProfileScreen = ({ navigation }) => {
   const userInfo = useSelector(getUserInfo);
 
   useEffect(() => {
-    if (!userInfo?.firstName) {
-      getProfileData();
-    }
     init();
   }, []);
 
   const init = async () => {
+    await getProfileData();
     await askForPermission();
     await getDonationHistory();
   };
@@ -129,9 +127,9 @@ export default ProfileScreen = ({ navigation }) => {
   };
 
   const getDonationHistory = async () => {
-    const response = await UserServieApi.getDonationHitory();
+    const response = await UserServieApi.getDonationHitory(userInfo?.id);
     if (response?.success) {
-      setDonationHistory(response?.payload);
+      setDonationHistory(response?.payload?.donationHistories);
     }
   };
 
@@ -228,7 +226,7 @@ export default ProfileScreen = ({ navigation }) => {
           </Pressable>
         </View>
         <ScrollView style={{ marginTop: 20 }}>
-          {donationHistory.length > 1 ? (
+          {donationHistory.length > 0 ? (
             donationHistory.map((list, index) => (
               <Pressable key={index}>
                 <DonateDateList

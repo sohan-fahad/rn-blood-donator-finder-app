@@ -38,9 +38,7 @@ export default LoginScreen = ({ navigation }) => {
           identifier: phoneNumber,
           password,
         };
-        // console.log(phoneNumber, password);
         const response = await AuthApiService.login(requestObj);
-        console.log(response);
         if (response.statusCode === 200) {
           dispatch(addUserInfo(response.payload?.user));
           dispatch(

@@ -14,18 +14,26 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment";
 import { UserServieApi } from "../../../services/user.service";
 import CustomText from "../../../components/Text/CustomText";
+import { showMessage } from "react-native-flash-message";
+import { addUserInfo } from "../../../store/reducers/userInfoSlice";
+import { useDispatch } from "react-redux";
+import Input from "../../../components/Text/Input";
 
 const UpdateUserInfoModal = ({ closeModal, userInfo }) => {
+  console.log(userInfo);
   const [bloodGroup, setBloodGroup] = useState(userInfo?.bloodGroup);
   const [gender, setGender] = useState(userInfo?.gender);
-  const [height, setHeight] = useState(userInfo?.height || 0);
-  const [weight, setWeight] = useState(userInfo?.weight || 0);
+  const [height, setHeight] = useState(userInfo?.height);
+  const [weight, setWeight] = useState(userInfo?.weight);
   const [dob, setDob] = useState(userInfo?.dob || "");
   const [name, setName] = useState(userInfo?.firstName);
 
+  const [datePickerPlaceHolder, setDatePickerPlaceHolder] = useState("");
+
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [datePickerPlaceHolder, setDatePickerPlaceHolder] = useState("");
+
+  const dispatch = useDispatch();
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -53,10 +61,23 @@ const UpdateUserInfoModal = ({ closeModal, userInfo }) => {
         weight,
       };
       const response = await UserServieApi.updateInfo(payload, userInfo?.id);
-      console.log(response);
+      if (response?.success) {
+        dispatch(addUserInfo(response?.payload));
+        showMessage({
+          message: "",
+          description: "Profile Data updated1",
+          type: "success",
+        });
+      }
     } catch (error) {
+      showMessage({
+        message: "",
+        description: error.message,
+        type: "danger",
+      });
     } finally {
       setIsLoading(false);
+      closeModal();
     }
   };
 
@@ -73,7 +94,7 @@ const UpdateUserInfoModal = ({ closeModal, userInfo }) => {
           style={styles.inputView}
           showsVerticalScrollIndicator={false}
         >
-          <TextInput
+          <Input
             style={styles.input}
             placeholder="Enter Name"
             handleTextInput={(text) => setName(text)}
@@ -112,17 +133,19 @@ const UpdateUserInfoModal = ({ closeModal, userInfo }) => {
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            <TextInput
+            <Input
               style={[styles.input, { width: "48%" }]}
               placeholder="Enter Height"
               handleTextInput={(text) => setHeight(text)}
               keyboardType="phone-pad"
+              defaultValue={height}
             />
-            <TextInput
+            <Input
               style={[styles.input, { width: "48%" }]}
               placeholder="Enter weight"
               handleTextInput={(text) => setWeight(text)}
               keyboardType="phone-pad"
+              value={weight}
             />
           </View>
 
@@ -164,7 +187,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
     left: 0,
-    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -173,11 +195,12 @@ const styles = StyleSheet.create({
     padding: 15,
     backgroundColor: colors.white,
     width: "95%",
-    height: "95%",
+    height: "70%",
     borderRadius: 5,
     position: "relative",
     justifyContent: "center",
     alignItems: "center",
+    flexDirection: "column",
   },
   closeWrapper: {
     position: "absolute",

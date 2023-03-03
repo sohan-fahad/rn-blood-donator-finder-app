@@ -30,7 +30,6 @@ const UpdateLastDonationData = ({ closeModal, getDonationHistory }) => {
     hideDatePicker();
   };
   const userInfo = useSelector(getUserInfo);
-  // console.log(userInfo)
 
   const updateLastDonationHistory = async () => {
     setIsLoading(true);
@@ -39,7 +38,6 @@ const UpdateLastDonationData = ({ closeModal, getDonationHistory }) => {
         userInfo?.id,
         donationDate
       );
-      console.log(response);
       if (response?.success) {
         getDonationHistory();
         setIsLoading(false);
