@@ -4,10 +4,13 @@ import UpdateLastDonationData from "../../screens/ProfileScreen/components/Updat
 import UpdateUserInfoModal from "../../screens/ProfileScreen/components/UpdateUserInfoModal";
 import {
   closeProfileEditModal,
+  closeReminderModal,
   closeUpdateLastDonateModa,
   getModalData,
 } from "../../store/reducers/globalModalsSlice";
 import Modal from "./Modal";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import SetReminderModal from "../../screens/ProfileScreen/components/SetReminderModal";
 
 const ModalConatiner = () => {
   const {
@@ -15,6 +18,7 @@ const ModalConatiner = () => {
     isProfileEditModal,
     isProfileSettingsModal,
     isUpdateLastDonateModal,
+    isReminderModal,
   } = useSelector(getModalData);
 
   const dispatch = useDispatch();
@@ -31,6 +35,10 @@ const ModalConatiner = () => {
         <UpdateLastDonationData
           closeModal={() => dispatch(closeUpdateLastDonateModa())}
         />
+      )}
+
+      {isReminderModal && (
+        <SetReminderModal closeModal={() => dispatch(closeReminderModal())} />
       )}
     </Modal>
   );

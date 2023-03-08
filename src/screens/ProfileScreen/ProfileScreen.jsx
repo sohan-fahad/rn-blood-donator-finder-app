@@ -26,19 +26,12 @@ import moment from "moment";
 import { UserServieApi } from "../../services/user.service";
 import { getTokenInfo, removeTokenInfo } from "../../store/reducers/tokenSlice";
 import { AuthApiService } from "../../services/auth.service";
-import SettingsSvg from "../../svg/SettingsSvg";
-import EditIconSvg from "../../svg/EditIconSvg";
-import MessagesIconSvg from "../../svg/MessagesIconSvg";
-import UpdateLastDonationData from "./components/UpdateLastDonationData";
-import UpdateUserInfoModal from "./components/UpdateUserInfoModal";
 import UserProfileInfo from "../../components/UserProfileInfo";
 import UserMenu from "./components/UserMenu";
 import {
   getModalData,
-  openProfileEditModal,
   openUpdateLastDonateModa,
 } from "../../store/reducers/globalModalsSlice";
-import { increment } from "../../store/reducers/counterSlice";
 
 export default ProfileScreen = ({ navigation }) => {
   const [donationHistory, setDonationHistory] = useState([]);

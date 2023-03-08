@@ -1,10 +1,14 @@
 import { Feather } from "@expo/vector-icons";
+import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import React from "react";
 import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { useDispatch } from "react-redux";
 import CustomText from "../../../components/Text/CustomText";
-import { openProfileEditModal } from "../../../store/reducers/globalModalsSlice";
+import {
+  openProfileEditModal,
+  openReminderModal,
+} from "../../../store/reducers/globalModalsSlice";
 import AlermIconSvg from "../../../svg/AlermIconSvg";
 import CalenderClockIconSvg from "../../../svg/CalenderClockIconSvg";
 import EditIconSvg from "../../../svg/EditIconSvg";
@@ -39,7 +43,10 @@ const UserMenu = () => {
           <CustomText style={styles.menu_text}>History</CustomText>
         </Pressable>
 
-        <Pressable style={styles.menu_icon_wrapper}>
+        <Pressable
+          style={styles.menu_icon_wrapper}
+          onPress={() => dispatch(openReminderModal())}
+        >
           <AlermIconSvg />
           <CustomText style={styles.menu_text}>Set Reminder</CustomText>
         </Pressable>
