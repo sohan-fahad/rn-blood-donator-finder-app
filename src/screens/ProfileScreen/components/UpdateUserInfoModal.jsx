@@ -16,11 +16,13 @@ import { UserServieApi } from "../../../services/user.service";
 import CustomText from "../../../components/Text/CustomText";
 import { showMessage } from "react-native-flash-message";
 import { addUserInfo } from "../../../store/reducers/userInfoSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Input from "../../../components/Text/Input";
+import { getUserInfo } from "../../../store/reducers/userInfoSlice";
 
-const UpdateUserInfoModal = ({ closeModal, userInfo }) => {
-  console.log(userInfo);
+const UpdateUserInfoModal = ({ closeModal }) => {
+  const userInfo = useSelector(getUserInfo);
+
   const [bloodGroup, setBloodGroup] = useState(userInfo?.bloodGroup);
   const [gender, setGender] = useState(userInfo?.gender);
   const [height, setHeight] = useState(userInfo?.height);
@@ -82,99 +84,92 @@ const UpdateUserInfoModal = ({ closeModal, userInfo }) => {
   };
 
   return (
-    <View style={styles.modalWrapper}>
-      <View style={styles.modalBox}>
-        <View style={styles.closeWrapper}>
-          <Pressable onPress={closeModal}>
-            <CrossIcon />
-          </Pressable>
+    // <View style={styles.modalWrapper}>
+    <View style={styles.modalBox}>
+      <View style={styles.closeWrapper}>
+        <Pressable onPress={closeModal}>
+          <CrossIcon />
+        </Pressable>
+      </View>
+
+      <ScrollView style={styles.inputView} showsVerticalScrollIndicator={false}>
+        <Input
+          style={styles.input}
+          placeholder="Enter Name"
+          handleTextInput={(text) => setName(text)}
+          autoCapitalize="words"
+          defaultValue={name}
+        />
+
+        <View style={styles.selectInput}>
+          <Picker
+            selectedValue={bloodGroup}
+            onValueChange={(itemValue) => setBloodGroup(itemValue)}
+          >
+            <Picker.Item label="Select Blood Group" value="" />
+            <Picker.Item label="A+" value="A+" />
+            <Picker.Item label="B+" value="B+" />
+            <Picker.Item label="O+" value="O+" />
+            <Picker.Item label="AB+" value="AB+" />
+            <Picker.Item label="A-" value="A-" />
+            <Picker.Item label="B-" value="B-" />
+            <Picker.Item label="O-" value="O-" />
+            <Picker.Item label="AB-" value="AB-" />
+          </Picker>
         </View>
 
-        <ScrollView
-          style={styles.inputView}
-          showsVerticalScrollIndicator={false}
-        >
-          <Input
-            style={styles.input}
-            placeholder="Enter Name"
-            handleTextInput={(text) => setName(text)}
-            autoCapitalize="words"
-            defaultValue={name}
-          />
-
-          <View style={styles.selectInput}>
-            <Picker
-              selectedValue={bloodGroup}
-              onValueChange={(itemValue) => setBloodGroup(itemValue)}
-            >
-              <Picker.Item label="Select Blood Group" value="" />
-              <Picker.Item label="A+" value="A+" />
-              <Picker.Item label="B+" value="B+" />
-              <Picker.Item label="O+" value="O+" />
-              <Picker.Item label="AB+" value="AB+" />
-              <Picker.Item label="A-" value="A-" />
-              <Picker.Item label="B-" value="B-" />
-              <Picker.Item label="O-" value="O-" />
-              <Picker.Item label="AB-" value="AB-" />
-            </Picker>
-          </View>
-
-          <View style={styles.selectInput}>
-            <Picker
-              selectedValue={gender}
-              onValueChange={(itemValue) => setGender(itemValue)}
-            >
-              <Picker.Item label="Select Gender" value="" />
-              <Picker.Item label="Male" value="Male" />
-              <Picker.Item label="Female" value="Female" />
-            </Picker>
-          </View>
-
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
+        <View style={styles.selectInput}>
+          <Picker
+            selectedValue={gender}
+            onValueChange={(itemValue) => setGender(itemValue)}
           >
-            <Input
-              style={[styles.input, { width: "48%" }]}
-              placeholder="Enter Height"
-              handleTextInput={(text) => setHeight(text)}
-              keyboardType="phone-pad"
-              defaultValue={height}
-            />
-            <Input
-              style={[styles.input, { width: "48%" }]}
-              placeholder="Enter weight"
-              handleTextInput={(text) => setWeight(text)}
-              keyboardType="phone-pad"
-              value={weight}
-            />
-          </View>
+            <Picker.Item label="Select Gender" value="" />
+            <Picker.Item label="Male" value="Male" />
+            <Picker.Item label="Female" value="Female" />
+          </Picker>
+        </View>
 
-          <View>
-            <Pressable onPress={showDatePicker}>
-              <CustomText style={[styles.input, { paddingVertical: 14 }]}>
-                {datePickerPlaceHolder
-                  ? datePickerPlaceHolder
-                  : "Date of Birth"}
-              </CustomText>
-            </Pressable>
-            <DateTimePickerModal
-              isVisible={isDatePickerVisible}
-              mode="date"
-              onConfirm={handleDateOfBirth}
-              onCancel={hideDatePicker}
-            />
-          </View>
-          {isLoading === true ? (
-            <CustomText style={styles.updateBtn}>
-              <ActivityIndicator size={23} color={colors.white} />
+        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Input
+            style={[styles.input, { width: "48%" }]}
+            placeholder="Enter Height"
+            handleTextInput={(text) => setHeight(text)}
+            keyboardType="phone-pad"
+            defaultValue={height}
+          />
+          <Input
+            style={[styles.input, { width: "48%" }]}
+            placeholder="Enter weight"
+            handleTextInput={(text) => setWeight(text)}
+            keyboardType="phone-pad"
+            value={weight}
+          />
+        </View>
+
+        <View>
+          <Pressable onPress={showDatePicker}>
+            <CustomText style={[styles.input, { paddingVertical: 14 }]}>
+              {datePickerPlaceHolder ? datePickerPlaceHolder : "Date of Birth"}
             </CustomText>
-          ) : (
-            <Pressable onPress={updateInfo}>
-              <CustomText style={styles.updateBtn}>Update</CustomText>
-            </Pressable>
-          )}
-        </ScrollView>
-      </View>
+          </Pressable>
+          <DateTimePickerModal
+            isVisible={isDatePickerVisible}
+            mode="date"
+            onConfirm={handleDateOfBirth}
+            onCancel={hideDatePicker}
+          />
+        </View>
+        {isLoading === true ? (
+          <CustomText style={styles.updateBtn}>
+            <ActivityIndicator size={23} color={colors.white} />
+          </CustomText>
+        ) : (
+          <Pressable onPress={updateInfo}>
+            <CustomText style={styles.updateBtn}>Update</CustomText>
+          </Pressable>
+        )}
+      </ScrollView>
+      {/* </View> */}
     </View>
   );
 };
@@ -186,7 +181,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     position: "absolute",
     top: 0,
-    left: 0,
+    right: 0,
     justifyContent: "center",
     alignItems: "center",
   },

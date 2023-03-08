@@ -10,7 +10,7 @@ import { getUserInfo } from "../../../store/reducers/userInfoSlice";
 import { useSelector } from "react-redux";
 import { showMessage } from "react-native-flash-message";
 
-const UpdateLastDonationData = ({ closeModal, getDonationHistory }) => {
+const UpdateLastDonationData = ({ closeModal }) => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [datePickerPlaceHolder, setDatePickerPlaceHolder] = useState("");
@@ -39,7 +39,7 @@ const UpdateLastDonationData = ({ closeModal, getDonationHistory }) => {
         donationDate
       );
       if (response?.success) {
-        getDonationHistory();
+        // getDonationHistory();
         setIsLoading(false);
         closeModal();
         showMessage({
@@ -59,45 +59,45 @@ const UpdateLastDonationData = ({ closeModal, getDonationHistory }) => {
   };
 
   return (
-    <View style={styles.modalWrapper}>
-      <View style={styles.modalBox}>
-        <View style={styles.closeWrapper}>
-          <Pressable onPress={closeModal}>
-            <CrossIcon />
+    // <View style={styles.modalWrapper}>
+    <View style={styles.modalBox}>
+      <View style={styles.closeWrapper}>
+        <Pressable onPress={closeModal}>
+          <CrossIcon />
+        </Pressable>
+      </View>
+      <View style={styles.formWrapper}>
+        <View style={styles.dateWrapper}>
+          <Pressable onPress={showDatePicker}>
+            <CustomText style={[styles.input, { paddingVertical: 14 }]}>
+              {datePickerPlaceHolder
+                ? datePickerPlaceHolder
+                : "Pick Last Donation Date"}
+            </CustomText>
           </Pressable>
+          <DateTimePickerModal
+            isVisible={isDatePickerVisible}
+            mode="date"
+            onConfirm={handleLastDonate}
+            onCancel={hideDatePicker}
+          />
         </View>
-        <View style={styles.formWrapper}>
-          <View style={styles.dateWrapper}>
-            <Pressable onPress={showDatePicker}>
-              <CustomText style={[styles.input, { paddingVertical: 14 }]}>
-                {datePickerPlaceHolder
-                  ? datePickerPlaceHolder
-                  : "Pick Last Donation Date"}
-              </CustomText>
-            </Pressable>
-            <DateTimePickerModal
-              isVisible={isDatePickerVisible}
-              mode="date"
-              onConfirm={handleLastDonate}
-              onCancel={hideDatePicker}
-            />
+        {isLoading === true ? (
+          <View style={styles.updateBtn}>
+            <CustomText style={styles.signUpBtn}>
+              <ActivityIndicator size={23} color={colors.white} />
+            </CustomText>
           </View>
-          {isLoading === true ? (
+        ) : (
+          <Pressable onPress={updateLastDonationHistory}>
             <View style={styles.updateBtn}>
-              <CustomText style={styles.signUpBtn}>
-                <ActivityIndicator size={23} color={colors.white} />
-              </CustomText>
+              <CustomText style={{ color: colors.white }}>Update</CustomText>
             </View>
-          ) : (
-            <Pressable onPress={updateLastDonationHistory}>
-              <View style={styles.updateBtn}>
-                <CustomText style={{ color: colors.white }}>Update</CustomText>
-              </View>
-            </Pressable>
-          )}
-        </View>
+          </Pressable>
+        )}
       </View>
     </View>
+    // </View>
   );
 };
 

@@ -7,6 +7,7 @@ import loadingBtnReducer from "./reducers/isLoadingBtnSlice";
 import userInfoReducer from "./reducers/userInfoSlice";
 import tokenInfoReducer from "./reducers/tokenSlice";
 import addAreaListReducer from "./reducers/addAreaListSlice";
+import globalModalsReducer from "./reducers/globalModalsSlice";
 
 const rootReducer = combineReducers({
   counter: counterReducer,
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
   addUserInfo: userInfoReducer,
   addTokenInfo: tokenInfoReducer,
   areaList: addAreaListReducer,
+  globalModals: globalModalsReducer,
 });
 
 const store = configureStore({

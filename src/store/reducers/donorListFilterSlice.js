@@ -7,6 +7,7 @@ export const donorListFilterSlice = createSlice({
   },
   reducers: {
     addDonatorFilter: (state, action) => {
+      console.log("sss");
       state.value = action.payload;
     },
     removeFilter: (state) => {
@@ -21,7 +22,6 @@ export const donorListFilterSlice = createSlice({
   },
 });
 
-export const { addDonatorFilter, removeDonatorFilter } =
-  donorListFilterSlice.actions;
+export const { addDonatorFilter, removeFilter } = donorListFilterSlice.actions;
 export const selectFilterObj = (state) => state.donorsFilter.value;
 export default donorListFilterSlice.reducer;

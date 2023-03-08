@@ -29,6 +29,7 @@ import {
   removeTokenInfo,
 } from "./src/store/reducers/tokenSlice";
 import CustomText from "./src/components/Text/CustomText";
+import ModalConatiner from "./src/components/Modals/ModalConatiner";
 
 const Stack = createNativeStackNavigator();
 
@@ -96,6 +97,7 @@ const Container = () => {
       </NavigationContainer>
       <StatusBar style="light" />
       <FlashMessage position="top" />
+      <ModalConatiner />
     </>
   );
 };
