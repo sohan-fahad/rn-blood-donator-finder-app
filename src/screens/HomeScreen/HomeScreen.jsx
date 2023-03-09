@@ -35,7 +35,7 @@ import {
 import AreaPcker from "../../components/Picker/AreaPicker";
 
 export default HomeScreen = ({ navigation }) => {
-  const [bloodGroup, setBloodGroup] = useState("");
+  const [bloodGroup, setBloodGroup] = useState({ name: "", id: "" });
   const [division, setDivision] = useState("");
   const [city, setCity] = useState({ name: "", id: "" });
   const [area, setArea] = useState({ name: "", id: "" });
@@ -49,14 +49,14 @@ export default HomeScreen = ({ navigation }) => {
   const [isAreaModal, setIsAreaModal] = useState(false);
 
   const bloodGroups = [
-    { name: "A+", id: "A+" },
-    { name: "B+", id: "B+" },
-    { name: "O+", id: "O+" },
-    { name: "AB+", id: "AB+" },
-    { name: "A-", id: "A-" },
-    { name: "B-", id: "B-" },
-    { name: "O-", id: "O-" },
-    { name: "AB-", id: "AB-" },
+    { name: "A+", id: "a-positive" },
+    { name: "B+", id: "b-positive" },
+    { name: "O+", id: "o-positive" },
+    { name: "AB+", id: "ab-positive" },
+    { name: "A-", id: "a-negative" },
+    { name: "B-", id: "b-negative" },
+    { name: "O-", id: "o-negative" },
+    { name: "AB-", id: "ab-negative" },
   ];
   const divisionList = [
     { name: "Dhaka", id: "Dhaka" },
@@ -113,8 +113,9 @@ export default HomeScreen = ({ navigation }) => {
         setCity({});
         setArea({});
         const response = await LocationApiService.getCities(division);
+        console.log(response);
         if (response.statusCode === 200) {
-          setCityList(response?.payload);
+          setCityList(response?.payload?.data);
         } else {
           showMessage({
             message: "",
@@ -139,9 +140,10 @@ export default HomeScreen = ({ navigation }) => {
           id ? id : city.id,
           area
         );
+
+        console.log(response);
         if (response.statusCode === 200) {
-          dispatch(addAreas(response?.payload));
-          // setAreaList(response?.payload);
+          dispatch(addAreas(response?.payload?.data));
         } else {
           showMessage({
             message: "",
@@ -233,7 +235,7 @@ export default HomeScreen = ({ navigation }) => {
               <Pressable onPress={() => setIsBloodModal(true)}>
                 <View style={styles.selectOption}>
                   <CustomText>
-                    {bloodGroup ? bloodGroup : "Select Blood Group"}
+                    {bloodGroup.name ? bloodGroup.name : "Select Blood Group"}
                   </CustomText>
                   <DownArrow width={20} height={20} />
                 </View>
@@ -262,7 +264,7 @@ export default HomeScreen = ({ navigation }) => {
                 <Pressable onPress={() => setIsCityModal(true)}>
                   <View style={styles.selectOption}>
                     <CustomText>
-                      {city?.name ? city?.name : "Select District"}
+                      {city?.name ? city?.name : "Select City"}
                     </CustomText>
                     <DownArrow width={20} height={20} />
                   </View>
@@ -309,7 +311,7 @@ export default HomeScreen = ({ navigation }) => {
       {isBloodModal && (
         <CustomSelect
           elements={bloodGroups}
-          handleSelect={(item) => setBloodGroup(item?.name)}
+          handleSelect={(item) => setBloodGroup(item)}
           closeModal={() => setIsBloodModal(false)}
         />
       )}
@@ -327,7 +329,6 @@ export default HomeScreen = ({ navigation }) => {
           elements={cityList}
           handleSelect={(item) => handleCity(item?.id, item?.name)}
           closeModal={() => setIsCityModal(false)}
-          isSearch={true}
         />
       )}
 

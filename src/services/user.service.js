@@ -20,6 +20,12 @@ export const UserServieApi = {
   },
   getDonors: async (bloodGroup, division, city, area) => {
     const response = await GetHttp(
+      `/users/search-donor?bloodGroup=${bloodGroup}&city=${city}&area=${area}&division=${division}`
+    );
+    return response;
+  },
+  getNearbyDonors: async (bloodGroup, division, city, area) => {
+    const response = await GetHttp(
       `/users/nearby?bloodGroup=${bloodGroup}&city=${city}&area=${area}&division=${division}`
     );
     return response;

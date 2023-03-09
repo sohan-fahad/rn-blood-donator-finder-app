@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useEffect } from "react";
 import {
   FlatList,
   Pressable,
@@ -44,12 +45,12 @@ const CustomSelect = ({
 
   return (
     <View style={styles.modalWrapper}>
-      <View style={styles.closeWrapper}>
-        <Pressable onPress={closeModal}>
-          <CrossIcon />
-        </Pressable>
-      </View>
       <View style={styles.modalBox}>
+        <View style={styles.closeWrapper}>
+          <Pressable onPress={closeModal}>
+            <CrossIcon />
+          </Pressable>
+        </View>
         {isSearch && (
           <Input
             style={styles.searchInput}

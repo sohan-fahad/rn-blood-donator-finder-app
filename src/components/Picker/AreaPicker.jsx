@@ -73,7 +73,7 @@ const AreaPcker = ({ handleSelect, closeModal, cityId }) => {
           handleTextInput={(text) => handleSearch(text)}
           placeholder="Seerch here"
         />
-        <View style={{ width: "100%" }}>
+        <View style={{ width: "100%", overflow: "hidden" }}>
           <FlatList
             data={areas}
             renderItem={renderItem}

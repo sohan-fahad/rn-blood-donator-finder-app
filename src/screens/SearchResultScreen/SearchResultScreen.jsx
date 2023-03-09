@@ -37,11 +37,13 @@ export default SearchResultScreen = ({ navigation }) => {
     try {
       if (bloodGroup && division && city) {
         const response = await UserServieApi.getDonors(
-          bloodGroup,
+          bloodGroup.id,
           division,
           city,
           area
         );
+
+        console.log(response);
 
         if (response.statusCode === 200) {
           setDonors(response?.payload?.payload);
