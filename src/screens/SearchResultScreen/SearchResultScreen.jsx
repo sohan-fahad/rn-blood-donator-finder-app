@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import globalStyles from "../../theme/globalStyles";
 
 import { UserServieApi } from "../../services/user.service";
+import SearchTerm from "./components/SearchTerm";
 
 export default SearchResultScreen = ({ navigation }) => {
   const [donors, setDonors] = useState([]);
@@ -39,14 +40,12 @@ export default SearchResultScreen = ({ navigation }) => {
         const response = await UserServieApi.getDonors(
           bloodGroup.id,
           division,
-          city,
-          area
+          city?.id,
+          area?.id
         );
 
-        console.log(response);
-
-        if (response.statusCode === 200) {
-          setDonors(response?.payload?.payload);
+        if (response.success) {
+          setDonors(response?.payload);
         }
       }
       setIsLoading(false);
@@ -63,6 +62,16 @@ export default SearchResultScreen = ({ navigation }) => {
           <AntDesign name="arrowleft" size={24} color={colors.red} />
         </Pressable>
         <CustomText style={styles.headerText}>Search Result</CustomText>
+      </View>
+      <View style={styles.searchTerm}>
+        <SearchTerm
+          searchTermName={"Blood Group"}
+          searchTermValue={bloodGroup.name}
+        />
+        <SearchTerm searchTermName={"City"} searchTermValue={city?.name} />
+        {area?.name && (
+          <SearchTerm searchTermName={"Area"} searchTermValue={area?.name} />
+        )}
       </View>
       <ScrollView style={styles.scrollView}>
         {donors?.length > 0 && !isLoading ? (
@@ -87,6 +96,10 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 40,
     paddingHorizontal: spacing[5],
+  },
+  searchTerm: {
+    paddingHorizontal: spacing[5],
+    marginTop: 10,
   },
   headerView: {
     position: "relative",

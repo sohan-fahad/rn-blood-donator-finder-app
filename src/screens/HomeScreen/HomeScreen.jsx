@@ -113,7 +113,6 @@ export default HomeScreen = ({ navigation }) => {
         setCity({});
         setArea({});
         const response = await LocationApiService.getCities(division);
-        console.log(response);
         if (response.statusCode === 200) {
           setCityList(response?.payload?.data);
         } else {
@@ -141,7 +140,6 @@ export default HomeScreen = ({ navigation }) => {
           area
         );
 
-        console.log(response);
         if (response.statusCode === 200) {
           dispatch(addAreas(response?.payload?.data));
         } else {
@@ -171,14 +169,14 @@ export default HomeScreen = ({ navigation }) => {
   };
 
   const handleSearch = async () => {
-    if (bloodGroup && division && city) {
+    if (bloodGroup && division && city.name && area.name) {
       dispatch(
         addDonatorFilter({
           bloodGroup,
           donateType,
           division,
-          city: city?.id,
-          area: area?.id,
+          city: city,
+          area: area,
         })
       );
       navigation.navigate("Search");
@@ -196,10 +194,16 @@ export default HomeScreen = ({ navigation }) => {
           description: "Select a divisin",
           type: "danger",
         });
+      } else if (!city.name) {
+        showMessage({
+          message: "",
+          description: "Select a city",
+          type: "danger",
+        });
       } else {
         showMessage({
           message: "",
-          description: "Select a district",
+          description: "Select a area",
           type: "danger",
         });
       }

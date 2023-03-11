@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 export const donorListFilterSlice = createSlice({
   name: "filterDonors",
   initialState: {
-    value: { bloodGroup: "", division: "", district: "", subDistrict: "" },
+    value: { bloodGroup: {}, division: {}, area: {}, city: {} },
   },
   reducers: {
     addDonatorFilter: (state, action) => {
@@ -15,8 +15,8 @@ export const donorListFilterSlice = createSlice({
         bloodGroup: "",
         donateType: "",
         division: "",
-        area: "",
-        city: "",
+        area: {},
+        city: {},
       };
     },
   },
