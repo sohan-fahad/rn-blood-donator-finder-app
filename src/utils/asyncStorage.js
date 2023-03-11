@@ -28,8 +28,8 @@ export const getAsyncStorageValue = async (key) => {
 
 export const getAsyncStorageStringfyValue = async (key) => {
   try {
-    const data = await JSON.parse(AsyncStorage.getItem(`@${key}`));
-    return data;
+    const data = await AsyncStorage.getItem(`@${key}`);
+    return JSON.parse(data);
   } catch (error) {
     console.log(error.message);
   }

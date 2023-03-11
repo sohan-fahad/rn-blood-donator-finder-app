@@ -4,8 +4,13 @@ import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { showMessage } from "react-native-flash-message";
 import CustomText from "../../../components/Text/CustomText";
+import { localStoreKeys } from "../../../data/localStoreKeys";
 import CrossIcon from "../../../svg/CrossIcon";
 import colors from "../../../theme/colors";
+import {
+  getAsyncStorageStringfyValue,
+  setAsyncStorageStringify,
+} from "../../../utils/asyncStorage";
 
 const SetReminderModal = ({ closeModal }) => {
   const [date, setDate] = useState(new Date());
@@ -34,12 +39,37 @@ const SetReminderModal = ({ closeModal }) => {
     showMode("time");
   };
 
-  const setReminder = () => {
+  const setReminder = async () => {
     const currentDateTime = moment().unix();
     const selectedDateTime = moment(date).unix();
-
     if (selectedDateTime <= currentDateTime) {
       setError("Please Select a future time!");
+    } else {
+      const preAlerms = await getAsyncStorageStringfyValue(
+        localStoreKeys.alerm
+      );
+      if (!preAlerms || preAlerms.length < 1) {
+        await setAsyncStorageStringify(localStoreKeys.alerm, [
+          { id: 1, date: moment(date).format() },
+        ]);
+        showMessage({
+          message: "",
+          description: `Set a reminder successfully!`,
+          type: "success",
+        });
+      } else if (preAlerms.length > 0) {
+        const newAlermsArr = [
+          ...preAlerms,
+          { id: preAlerms.length + 1, date: moment(date).format() },
+        ];
+        await setAsyncStorageStringify(localStoreKeys.alerm, newAlermsArr);
+        showMessage({
+          message: "",
+          description: `Set a reminder successfully!`,
+          type: "success",
+        });
+      }
+      closeModal();
     }
   };
 
