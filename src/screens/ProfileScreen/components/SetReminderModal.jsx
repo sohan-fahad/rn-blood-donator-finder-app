@@ -48,27 +48,24 @@ const SetReminderModal = ({ closeModal }) => {
       const preAlerms = await getAsyncStorageStringfyValue(
         localStoreKeys.alerm
       );
+
       if (!preAlerms || preAlerms.length < 1) {
         await setAsyncStorageStringify(localStoreKeys.alerm, [
-          { id: 1, date: moment(date).format() },
+          { id: Math.floor(Date.now() / 1000), date: moment(date).format() },
         ]);
-        showMessage({
-          message: "",
-          description: `Set a reminder successfully!`,
-          type: "success",
-        });
       } else if (preAlerms.length > 0) {
         const newAlermsArr = [
           ...preAlerms,
-          { id: preAlerms.length + 1, date: moment(date).format() },
+          { id: Math.floor(Date.now() / 1000), date: moment(date).format() },
         ];
         await setAsyncStorageStringify(localStoreKeys.alerm, newAlermsArr);
-        showMessage({
-          message: "",
-          description: `Set a reminder successfully!`,
-          type: "success",
-        });
+        setDate(new Date());
       }
+      showMessage({
+        message: "",
+        description: `Set a reminder successfully!`,
+        type: "success",
+      });
       closeModal();
     }
   };

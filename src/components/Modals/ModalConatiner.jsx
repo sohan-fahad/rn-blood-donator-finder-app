@@ -11,6 +11,7 @@ import {
 import Modal from "./Modal";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import SetReminderModal from "../../screens/ProfileScreen/components/SetReminderModal";
+import ReminderList from "../../screens/ProfileScreen/components/ReminderList";
 
 const ModalConatiner = () => {
   const {
@@ -19,6 +20,7 @@ const ModalConatiner = () => {
     isProfileSettingsModal,
     isUpdateLastDonateModal,
     isReminderModal,
+    isReminderListModal,
   } = useSelector(getModalData);
 
   const dispatch = useDispatch();
@@ -40,6 +42,8 @@ const ModalConatiner = () => {
       {isReminderModal && (
         <SetReminderModal closeModal={() => dispatch(closeReminderModal())} />
       )}
+
+      {isReminderListModal && <ReminderList />}
     </Modal>
   );
 };

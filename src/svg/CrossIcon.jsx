@@ -4,8 +4,8 @@ import colors from "../theme/colors";
 
 const CrossIcon = (props) => (
   <Svg
-    width={30}
-    height={30}
+    width={props?.width ? props.width : 30}
+    height={props?.height ? props.height : 30}
     viewBox="0 0 24 24"
     fill="none"
     stroke={colors.red}

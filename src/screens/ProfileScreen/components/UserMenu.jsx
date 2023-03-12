@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import CustomText from "../../../components/Text/CustomText";
 import {
   openProfileEditModal,
+  openReminderListModal,
   openReminderModal,
 } from "../../../store/reducers/globalModalsSlice";
 import AlermIconSvg from "../../../svg/AlermIconSvg";
@@ -50,7 +51,10 @@ const UserMenu = () => {
           <AlermIconSvg />
           <CustomText style={styles.menu_text}>Set Reminder</CustomText>
         </Pressable>
-        <Pressable style={styles.menu_icon_wrapper}>
+        <Pressable
+          style={styles.menu_icon_wrapper}
+          onPress={() => dispatch(openReminderListModal())}
+        >
           <CalenderClockIconSvg />
           <CustomText style={styles.menu_text}>Reminder List</CustomText>
         </Pressable>

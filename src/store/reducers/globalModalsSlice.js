@@ -6,6 +6,7 @@ const initialStateValue = {
   isLoveMessageModal: false,
   isUpdateLastDonateModal: false,
   isReminderModal: false,
+  isReminderListModal: false,
   isGlobalModal: false,
 };
 
@@ -51,6 +52,15 @@ const globalModalsSlice = createSlice({
       state.value.isGlobalModal = false;
     },
 
+    openReminderListModal: (state) => {
+      state.value.isGlobalModal = true;
+      state.value.isReminderListModal = true;
+    },
+    closeReminderListModal: (state) => {
+      state.value.isReminderListModal = false;
+      state.value.isGlobalModal = false;
+    },
+
     resetModal: (state) => {
       state.value = initialStateValue;
     },
@@ -66,6 +76,8 @@ export const {
   closeUpdateLastDonateModa,
   openReminderModal,
   closeReminderModal,
+  openReminderListModal,
+  closeReminderListModal,
   resetModal,
 } = globalModalsSlice.actions;
 
