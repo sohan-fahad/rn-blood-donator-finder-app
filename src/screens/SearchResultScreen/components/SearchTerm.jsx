@@ -8,7 +8,7 @@ const SearchTerm = ({ searchTermName, searchTermValue }) => {
     <View style={styles.searchTermWrapper}>
       <CustomText>{searchTermName}:</CustomText>
       <CustomText style={styles.term}>
-        {searchTermValue.slice(0, 15)}
+        {searchTermValue.slice(0, 30)}
       </CustomText>
     </View>
   );

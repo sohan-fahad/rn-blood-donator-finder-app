@@ -1,4 +1,5 @@
 import {
+  Button,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -22,29 +23,35 @@ import SearchTerm from "./components/SearchTerm";
 export default SearchResultScreen = ({ navigation }) => {
   const [donors, setDonors] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAreaSearch, setIsAreaSearch] = useState(true);
 
   const { bloodGroup, donateType, division, city, area } =
     useSelector(selectFilterObj);
 
   useEffect(() => {
     if (bloodGroup) {
-      getSearchResult();
+      getSearchResult(bloodGroup?.id, division, city?.id, area?.id);
       // getSearchResult(bloodGroup, division, district, subDistrict);
     }
   }, [!bloodGroup]);
 
-  const getSearchResult = async () => {
+  const getSearchResult = async (bloodGroup, division, city, area = "") => {
     setIsLoading(true);
+    if (area) {
+      setIsAreaSearch(true);
+    } else {
+      setIsAreaSearch(false);
+    }
     try {
       if (bloodGroup && division && city) {
         const response = await UserServieApi.getDonors(
-          bloodGroup.id,
+          bloodGroup,
           division,
-          city?.id,
-          area?.id
+          city,
+          area
         );
-
-        if (response.success) {
+        console.log(response);
+        if (response?.success) {
           setDonors(response?.payload);
         }
       }
@@ -69,7 +76,7 @@ export default SearchResultScreen = ({ navigation }) => {
           searchTermValue={bloodGroup.name}
         />
         <SearchTerm searchTermName={"City"} searchTermValue={city?.name} />
-        {area?.name && (
+        {area?.name && isAreaSearch && (
           <SearchTerm searchTermName={"Area"} searchTermValue={area?.name} />
         )}
       </View>
@@ -82,6 +89,21 @@ export default SearchResultScreen = ({ navigation }) => {
           </CustomText>
         )}
       </ScrollView>
+      {isAreaSearch ? (
+        <Pressable
+          onPress={() => getSearchResult(bloodGroup?.id, division, city?.id)}
+        >
+          <CustomText style={styles.citySearchBtn}>Search By City</CustomText>
+        </Pressable>
+      ) : (
+        <Pressable
+          onPress={() =>
+            getSearchResult(bloodGroup?.id, division, city?.id, area?.id)
+          }
+        >
+          <CustomText style={styles.citySearchBtn}>Search By Area</CustomText>
+        </Pressable>
+      )}
     </SafeAreaView>
   );
 };
@@ -91,6 +113,7 @@ const styles = StyleSheet.create({
     ...globalStyles.adroidSafeArea,
     flex: 1,
     width: "100%",
+    position: "relative",
   },
   scrollView: {
     paddingTop: 20,
@@ -116,5 +139,14 @@ const styles = StyleSheet.create({
   headerText: {
     fontFamily: typography.primaryMedium,
     color: colors.red,
+  },
+  citySearchBtn: {
+    width: "90%",
+    backgroundColor: colors.red,
+    color: colors.white,
+    textAlign: "center",
+    marginLeft: "5%",
+    padding: 10,
+    borderRadius: 5,
   },
 });
