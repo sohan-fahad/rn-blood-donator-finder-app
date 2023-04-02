@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import UpdateLastDonationData from "../../screens/ProfileScreen/components/UpdateLastDonationData";
 import UpdateUserInfoModal from "../../screens/ProfileScreen/components/UpdateUserInfoModal";
 import {
+  closeLoveMessageModal,
   closeProfileEditModal,
   closeReminderModal,
   closeUpdateLastDonateModa,
@@ -12,6 +13,7 @@ import Modal from "./Modal";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import SetReminderModal from "../../screens/ProfileScreen/components/SetReminderModal";
 import ReminderList from "../../screens/ProfileScreen/components/ReminderList";
+import LoveMessageModal from "../../screens/ProfileScreen/components/LoveMessageModal";
 
 const ModalConatiner = () => {
   const {
@@ -44,6 +46,12 @@ const ModalConatiner = () => {
       )}
 
       {isReminderListModal && <ReminderList />}
+
+      {isLoveMessageModal && (
+        <LoveMessageModal
+          closeModal={() => dispatch(closeLoveMessageModal())}
+        />
+      )}
     </Modal>
   );
 };

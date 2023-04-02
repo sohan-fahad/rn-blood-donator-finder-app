@@ -6,6 +6,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 import { useDispatch } from "react-redux";
 import CustomText from "../../../components/Text/CustomText";
 import {
+  openLoveMessageModal,
   openProfileEditModal,
   openReminderListModal,
   openReminderModal,
@@ -35,7 +36,10 @@ const UserMenu = () => {
           <EditIconSvg />
           <CustomText style={styles.menu_text}>Edit</CustomText>
         </Pressable>
-        <Pressable style={styles.menu_icon_wrapper}>
+        <Pressable
+          style={styles.menu_icon_wrapper}
+          onPress={() => dispatch(openLoveMessageModal())}
+        >
           <MessagesIconSvg />
           <CustomText style={styles.menu_text}>Loves</CustomText>
         </Pressable>
