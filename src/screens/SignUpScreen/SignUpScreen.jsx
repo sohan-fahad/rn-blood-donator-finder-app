@@ -201,41 +201,41 @@ export default SignUpScreen = ({ navigation }) => {
         cityId: city.id,
         areaId: area.id,
       };
-      // try {
-      //   const response = await AuthApiService.register(requestObj);
+      try {
+        const response = await AuthApiService.register(requestObj);
 
-      //   if (response.statusCode === 200) {
-      //     dispatch(addUserInfo(response.payload?.createdUser));
-      //     dispatch(
-      //       addTokenInfo({
-      //         token: response?.payload?.token,
-      //         refreshToken: response?.payload?.refreshToken,
-      //       })
-      //     );
-      //     await setAsyncStorageValue("token", response?.payload?.token);
-      //     await setAsyncStorageValue(
-      //       "refreshToken",
-      //       response?.payload?.refreshToken
-      //     );
+        if (response.statusCode === 200) {
+          dispatch(addUserInfo(response.payload?.createdUser));
+          dispatch(
+            addTokenInfo({
+              token: response?.payload?.token,
+              refreshToken: response?.payload?.refreshToken,
+            })
+          );
+          await setAsyncStorageValue("token", response?.payload?.token);
+          await setAsyncStorageValue(
+            "refreshToken",
+            response?.payload?.refreshToken
+          );
 
-      //     showMessage({
-      //       message: "",
-      //       description: "Sign up successfull!",
-      //       type: "success",
-      //     });
-      //     navigation.navigate("Home");
-      //   } else {
-      //     showMessage({
-      //       message: "",
-      //       description: response?.message,
-      //       type: "danger",
-      //     });
-      //   }
-      //   setIsLoading(false);
-      // } catch (error) {
-      //   console.log(error.message);
-      //   setIsLoading(false);
-      // }
+          showMessage({
+            message: "",
+            description: "Sign up successfull!",
+            type: "success",
+          });
+          navigation.navigate("Home");
+        } else {
+          showMessage({
+            message: "",
+            description: response?.message,
+            type: "danger",
+          });
+        }
+        setIsLoading(false);
+      } catch (error) {
+        console.log(error.message);
+        setIsLoading(false);
+      }
     } else {
       showMessage({
         message: "",
