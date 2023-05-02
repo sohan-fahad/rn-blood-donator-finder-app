@@ -7,7 +7,6 @@ export const donorListFilterSlice = createSlice({
   },
   reducers: {
     addDonatorFilter: (state, action) => {
-      console.log("sss");
       state.value = action.payload;
     },
     removeFilter: (state) => {

@@ -132,7 +132,7 @@ export default SignUpScreen = ({ navigation }) => {
       if (division) {
         const response = await LocationApiService.getCities(division);
         if (response.statusCode === 200) {
-          setCityList(response?.payload);
+          setCityList(response?.payload?.data);
         } else {
           showMessage({
             message: "",
@@ -158,7 +158,7 @@ export default SignUpScreen = ({ navigation }) => {
           area
         );
         if (response.statusCode === 200) {
-          dispatch(addAreas(response?.payload));
+          dispatch(addAreas(response?.payload?.data));
           // setAreaList(response?.payload);
         } else {
           showMessage({
@@ -178,13 +178,14 @@ export default SignUpScreen = ({ navigation }) => {
   };
 
   const userRegister = async () => {
+    console.log("clicksss");
     if (
       email &&
       password &&
       name &&
       phoneNumber &&
-      division &&
-      city &&
+      division.id &&
+      city.id &&
       bloodGroup &&
       donationDate
     ) {
@@ -200,41 +201,41 @@ export default SignUpScreen = ({ navigation }) => {
         cityId: city.id,
         areaId: area.id,
       };
-      try {
-        const response = await AuthApiService.register(requestObj);
+      // try {
+      //   const response = await AuthApiService.register(requestObj);
 
-        if (response.statusCode === 200) {
-          dispatch(addUserInfo(response.payload?.createdUser));
-          dispatch(
-            addTokenInfo({
-              token: response?.payload?.token,
-              refreshToken: response?.payload?.refreshToken,
-            })
-          );
-          await setAsyncStorageValue("token", response?.payload?.token);
-          await setAsyncStorageValue(
-            "refreshToken",
-            response?.payload?.refreshToken
-          );
+      //   if (response.statusCode === 200) {
+      //     dispatch(addUserInfo(response.payload?.createdUser));
+      //     dispatch(
+      //       addTokenInfo({
+      //         token: response?.payload?.token,
+      //         refreshToken: response?.payload?.refreshToken,
+      //       })
+      //     );
+      //     await setAsyncStorageValue("token", response?.payload?.token);
+      //     await setAsyncStorageValue(
+      //       "refreshToken",
+      //       response?.payload?.refreshToken
+      //     );
 
-          showMessage({
-            message: "",
-            description: "Sign up successfull!",
-            type: "success",
-          });
-          navigation.navigate("Home");
-        } else {
-          showMessage({
-            message: "",
-            description: response?.message,
-            type: "danger",
-          });
-        }
-        setIsLoading(false);
-      } catch (error) {
-        console.log(error.message);
-        setIsLoading(false);
-      }
+      //     showMessage({
+      //       message: "",
+      //       description: "Sign up successfull!",
+      //       type: "success",
+      //     });
+      //     navigation.navigate("Home");
+      //   } else {
+      //     showMessage({
+      //       message: "",
+      //       description: response?.message,
+      //       type: "danger",
+      //     });
+      //   }
+      //   setIsLoading(false);
+      // } catch (error) {
+      //   console.log(error.message);
+      //   setIsLoading(false);
+      // }
     } else {
       showMessage({
         message: "",
