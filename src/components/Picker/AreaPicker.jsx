@@ -26,7 +26,6 @@ const AreaPcker = ({ handleSelect, closeModal, cityId }) => {
       try {
         if (cityId) {
           const response = await LocationApiService.getAreas(cityId, text);
-          console.log(response);
           if (response.statusCode === 200) {
             // dispatch(addAreas(response?.payload.data));
             setAreas(response?.payload.data);
