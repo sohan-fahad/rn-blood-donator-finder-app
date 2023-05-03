@@ -178,14 +178,14 @@ export default SignUpScreen = ({ navigation }) => {
   };
 
   const userRegister = async () => {
-    console.log("clicksss");
     if (
       email &&
       password &&
       name &&
       phoneNumber &&
-      division.id &&
+      division &&
       city.id &&
+      area.id &&
       bloodGroup &&
       donationDate
     ) {
@@ -198,12 +198,11 @@ export default SignUpScreen = ({ navigation }) => {
         bloodGroup: bloodGroup,
         lastDonated: moment(donationDate).format(),
         division,
-        cityId: city.id,
-        areaId: area.id,
+        city: city.id,
+        area: area.id,
       };
       try {
         const response = await AuthApiService.register(requestObj);
-
         if (response.statusCode === 200) {
           dispatch(addUserInfo(response.payload?.createdUser));
           dispatch(
@@ -217,7 +216,6 @@ export default SignUpScreen = ({ navigation }) => {
             "refreshToken",
             response?.payload?.refreshToken
           );
-
           showMessage({
             message: "",
             description: "Sign up successfull!",
