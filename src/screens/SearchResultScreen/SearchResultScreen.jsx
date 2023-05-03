@@ -82,7 +82,9 @@ export default SearchResultScreen = ({ navigation }) => {
       </View>
       <ScrollView style={styles.scrollView}>
         {donors?.length > 0 && !isLoading ? (
-          donors?.map((donor, index) => <DonorCard key={index} donor={donor} />)
+          donors?.map((donor, index) => (
+            <DonorCard key={index} donor={donor} navigation={navigation} />
+          ))
         ) : (
           <CustomText>
             {isLoading ? "Searching..." : "No donor found!"}

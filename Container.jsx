@@ -30,6 +30,7 @@ import {
 } from "./src/store/reducers/tokenSlice";
 import CustomText from "./src/components/Text/CustomText";
 import ModalConatiner from "./src/components/Modals/ModalConatiner";
+import PublicProfileScreen from "./src/screens/PublicProfileScreen/PublicProfileScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -83,6 +84,10 @@ const Container = () => {
             <>
               <Stack.Screen name="Home" component={HomeScreen} />
               <Stack.Screen name="Profile" component={ProfileScreen} />
+              <Stack.Screen
+                name="PublicProfile"
+                component={PublicProfileScreen}
+              />
               <Stack.Screen name="Search" component={SearchResultScreen} />
             </>
           ) : (

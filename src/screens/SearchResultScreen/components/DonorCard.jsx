@@ -4,7 +4,7 @@ import colors from "../../../theme/colors";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 
-export default DonorCard = ({ donor }) => {
+export default DonorCard = ({ navigation, donor }) => {
   const { firstName, bloodGroup, lastDonated, avatar, phoneNumber } = donor;
   const goDialPad = () => {
     Linking.openURL(`tel:${phoneNumber}`);
@@ -24,11 +24,17 @@ export default DonorCard = ({ donor }) => {
       <View style={styles.contentWrapper}>
         <View style={{ width: "25%" }} />
         <View style={styles.donarInfo}>
-          <CustomText style={{ color: colors.red }}>{firstName}</CustomText>
-          <CustomText preset="small">Blood Group: {bloodGroup}</CustomText>
-          <CustomText preset="small">
-            Last Donation: {moment(lastDonated).format("DD-MM-YYYY")}
-          </CustomText>
+          <Pressable
+            onPress={() =>
+              navigation.navigate("PublicProfile", { donorInfo: donor })
+            }
+          >
+            <CustomText style={{ color: colors.red }}>{firstName}</CustomText>
+            <CustomText preset="small">Blood Group: {bloodGroup}</CustomText>
+            <CustomText preset="small">
+              Last Donation: {moment(lastDonated).format("DD-MM-YYYY")}
+            </CustomText>
+          </Pressable>
         </View>
         <Pressable
           style={{

@@ -12,7 +12,14 @@ import { useEffect } from "react";
 import mime from "mime";
 
 const UserProfileInfo = (props) => {
-  const { name, address, lastDonated, avatar, id = "" } = props;
+  const {
+    name,
+    address,
+    lastDonated,
+    avatar,
+    id = "",
+    isPublicProfile = false,
+  } = props;
 
   const dispatch = useDispatch();
 
@@ -97,7 +104,7 @@ const UserProfileInfo = (props) => {
         </View>
       </View>
       <View style={styles.imageView}>
-        {id && (
+        {id && !isPublicProfile && (
           <Pressable style={styles.imgEditBtn} onPress={handleUploadImage}>
             <Feather name="edit" size={15} color={colors.white} />
           </Pressable>
