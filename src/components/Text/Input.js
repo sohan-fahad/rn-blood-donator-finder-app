@@ -10,6 +10,7 @@ export default Input = ({
   keyboardType = "default",
   autoCapitalize = "",
   defaultValue = "" | 0,
+  multiline = false,
 }) => {
   const textStyle = StyleSheet.compose(presets[preset], style);
   return (
@@ -22,6 +23,7 @@ export default Input = ({
       autoCapitalize={autoCapitalize}
       autoCorrect={false}
       defaultValue={defaultValue}
+      multiline={multiline}
     />
   );
 };

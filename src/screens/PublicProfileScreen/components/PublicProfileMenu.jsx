@@ -3,46 +3,60 @@ import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import React from "react";
 import { useState } from "react";
 import { Linking, Pressable, StyleSheet, View } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import CustomText from "../../../components/Text/CustomText";
 import {
   openLoveMessageModal,
-  openProfileEditModal,
-  openReminderListModal,
-  openReminderModal,
+  openSendMessageModal,
 } from "../../../store/reducers/globalModalsSlice";
 import AlermIconSvg from "../../../svg/AlermIconSvg";
 import CalenderClockIconSvg from "../../../svg/CalenderClockIconSvg";
 import EditIconSvg from "../../../svg/EditIconSvg";
-import HistoryIconSvg from "../../../svg/HistoryIconSvg";
 import MessagesIconSvg from "../../../svg/MessagesIconSvg";
 import SettingsSvg from "../../../svg/SettingsSvg";
 import colors from "../../../theme/colors";
+import CallIconSvg from "../../../svg/CallIconSvg";
+import { sendMessageInfo } from "../../../store/reducers/sendMessageSlice";
+import { getUserInfo } from "../../../store/reducers/userInfoSlice";
 
-const PublicProfileMenu = ({ phoneNumber }) => {
+const PublicProfileMenu = ({ phoneNumber, id }) => {
   const dispatch = useDispatch();
   const goDialPad = () => {
     Linking.openURL(`tel:${phoneNumber}`);
+  };
+
+  const userInfo = useSelector(getUserInfo);
+
+  const openMessageModal = () => {
+    dispatch(
+      sendMessageInfo({
+        appreciator: userInfo?.id,
+        appreciated: id,
+        type: "Love",
+      })
+    );
+
+    if (userInfo?.id && id) {
+      dispatch(openSendMessageModal());
+    }
   };
   return (
     <>
       <View style={styles.menus_wrapper}>
         <Pressable style={styles.menu_icon_wrapper} onPress={goDialPad}>
-          <SettingsSvg />
+          {/* <SettingsSvg /> */}
+          <CallIconSvg />
           <CustomText style={styles.menu_text}>Call</CustomText>
-        </Pressable>
-        <Pressable
-          style={styles.menu_icon_wrapper}
-          onPress={() => dispatch(openProfileEditModal())}
-        >
-          <EditIconSvg />
-          <CustomText style={styles.menu_text}>Message</CustomText>
         </Pressable>
         <Pressable
           style={styles.menu_icon_wrapper}
           onPress={() => dispatch(openLoveMessageModal())}
         >
           <MessagesIconSvg />
+          <CustomText style={styles.menu_text}>Appreciations</CustomText>
+        </Pressable>
+        <Pressable style={styles.menu_icon_wrapper} onPress={openMessageModal}>
+          <EditIconSvg />
           <CustomText style={styles.menu_text}>Send Love</CustomText>
         </Pressable>
       </View>

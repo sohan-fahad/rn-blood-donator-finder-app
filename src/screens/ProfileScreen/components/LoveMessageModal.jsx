@@ -1,9 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import CrossIcon from "../../../svg/CrossIcon";
 import Message from "./Message";
+import { MessageApiService } from "../../../services/message.service";
+import CustomText from "../../../components/Text/CustomText";
+import colors from "../../../theme/colors";
 
 const LoveMessageModal = ({ closeModal }) => {
+  const [appreciations, setAppreciations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    getAppreciations();
+  }, [appreciations.length]);
+
+  const getAppreciations = async () => {
+    try {
+      setIsLoading(true);
+      const response = await MessageApiService.getAppreciations();
+      if (!response?.success) return;
+      setAppreciations(response?.payload?.data);
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <View style={styles.modalBox}>
       <View style={styles.closeWrapper}>
@@ -12,14 +34,26 @@ const LoveMessageModal = ({ closeModal }) => {
         </Pressable>
       </View>
       <ScrollView style={{ width: "100%", marginTop: 20 }}>
-        <Message
-          name="Sohan Fahad"
-          message="Thank you so much for your generous contribution! Your kindness means a lot to me and will make a significant difference in my life."
-        />
-        <Message
-          name="Shihub Munna"
-          message="I am deeply grateful for your donation. Your support has truly touched my heart, and I appreciate your generosity more than words can express. Thank you!"
-        />
+        {isLoading && appreciations.length < 1 && (
+          <CustomText style={{ color: colors.red }}>Loading</CustomText>
+        )}
+
+        {!isLoading && appreciations.length < 1 && (
+          <CustomText style={{ color: colors.red }}>
+            No appreciation found!
+          </CustomText>
+        )}
+
+        {!isLoading &&
+          appreciations.length > 0 &&
+          appreciations.map((el, index) => (
+            <Message
+              key={index}
+              name={el?.appreciator?.firstName}
+              message={el?.appreciationMessage}
+              avatar={el?.appreciator?.avatar}
+            />
+          ))}
       </ScrollView>
     </View>
   );

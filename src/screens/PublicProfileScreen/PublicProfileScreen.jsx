@@ -66,7 +66,10 @@ const PublicProfileScreen = ({ navigation, route }) => {
         id={donorInfo?.id}
         isPublicProfile={true}
       />
-      <PublicProfileMenu phoneNumber={donorInfo?.phoneNumber} />
+      <PublicProfileMenu
+        phoneNumber={donorInfo?.phoneNumber}
+        id={donorInfo?.id}
+      />
       {/* Donation history */}
       <View style={styles.donationListTitle}>
         <CustomText style={{ color: colors.red }}>

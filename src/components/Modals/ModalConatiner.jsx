@@ -6,6 +6,7 @@ import {
   closeLoveMessageModal,
   closeProfileEditModal,
   closeReminderModal,
+  closeSendMessageModal,
   closeUpdateLastDonateModa,
   getModalData,
 } from "../../store/reducers/globalModalsSlice";
@@ -14,6 +15,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import SetReminderModal from "../../screens/ProfileScreen/components/SetReminderModal";
 import ReminderList from "../../screens/ProfileScreen/components/ReminderList";
 import LoveMessageModal from "../../screens/ProfileScreen/components/LoveMessageModal";
+import SendMessageModal from "../../screens/PublicProfileScreen/components/SendMessageModal";
 
 const ModalConatiner = () => {
   const {
@@ -23,6 +25,7 @@ const ModalConatiner = () => {
     isUpdateLastDonateModal,
     isReminderModal,
     isReminderListModal,
+    isSendMessageModal,
   } = useSelector(getModalData);
 
   const dispatch = useDispatch();
@@ -50,6 +53,12 @@ const ModalConatiner = () => {
       {isLoveMessageModal && (
         <LoveMessageModal
           closeModal={() => dispatch(closeLoveMessageModal())}
+        />
+      )}
+
+      {isSendMessageModal && (
+        <SendMessageModal
+          closeModal={() => dispatch(closeSendMessageModal())}
         />
       )}
     </Modal>
